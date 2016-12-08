@@ -11,7 +11,7 @@ buildscript {
 }
 
 version "0.1"
-group "variantstorage"
+group "agha.variantstorage"
 
 apply plugin:"eclipse"
 apply plugin:"idea"

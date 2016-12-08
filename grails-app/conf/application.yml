@@ -2,7 +2,7 @@
 grails:
     profile: web
     codegen:
-        defaultPackage: variantstorage
+        defaultPackage: agha.variantstorage
     spring:
         transactionManagement:
             proxies: false

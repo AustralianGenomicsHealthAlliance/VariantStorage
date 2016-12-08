@@ -1,4 +1,4 @@
-package variantstorage
+package agha.variantstorage
 
 class UrlMappings {
 
