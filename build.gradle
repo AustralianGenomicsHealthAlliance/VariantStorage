@@ -7,8 +7,6 @@ buildscript {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
         classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.11.6"
         classpath "org.grails.plugins:hibernate5:6.0.4"
-        // camel
-        classpath 'org.apache.camel:camel-core:2.18.1'
     }
 }
 
@@ -58,6 +56,11 @@ dependencies {
 
     // camel
     compile 'org.apache.camel:camel-core:2.18.1'
+
+    // SQLite
+    compile 'org.xerial:sqlite-jdbc:3.15.1'
+    compile files('lib/sqlite-dialect-0.1.0.jar')
+
 }
 
 bootRun {

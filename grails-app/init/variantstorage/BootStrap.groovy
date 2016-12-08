@@ -7,13 +7,11 @@ import org.apache.log4j.Logger
 
 class BootStrap {
 
-    Logger logger = Logger.getLogger(BootStrap.class.getName())
 
     CamelContext camelCtx
 
     def init = { servletContext ->
         System.out.println("init out")
-        logger.info("init")
 
         initCamel()
 
