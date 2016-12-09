@@ -5,6 +5,7 @@ import org.apache.camel.Exchange
 import org.apache.camel.Processor
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.impl.DefaultCamelContext
+import org.apache.camel.model.dataformat.YAMLLibrary
 
 class BootStrap {
 
@@ -26,15 +27,23 @@ class BootStrap {
         camelCtx.addRoutes( new RouteBuilder() {
             @Override
             void configure() throws Exception {
-                from("file:/home/philip/ga4gh_registration?noop=true")
-                    .process(new Processor() {
+                from("file:/home/philip/ga4gh_registration?move=archived")
+                    .choice()
+                        .when(header("CamelFileName").endsWith(".yml"))
+                            .unmarshal()
+                            .yaml(YAMLLibrary.SnakeYAML)
+                            .process(new Processor() {
 
-                    @Override
-                    void process(Exchange exchange) throws Exception {
-                        ga4ghRegistrationService.registerDataset()
-                    }
+                                @Override
+                                void process(Exchange exchange) throws Exception {
+                                    ga4ghRegistrationService.registerDataset(exchange)
+                                }
 
-                }).to("file:/home/philip/ga4gh_registration_archive")
+                            })
+                        .otherwise()
+                            .log("Bad registration file: "+header("CamelFileName"))
+                    .end()
+                        //.to("file:/home/philip/ga4gh_registration_archive")
             }
         } )
 
