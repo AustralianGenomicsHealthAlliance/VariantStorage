@@ -15,7 +15,7 @@ class BootStrap {
         System.out.println("init out")
 
         initCamel()
-
+        testVariantSet()
 
     }
 
@@ -40,6 +40,14 @@ class BootStrap {
 
         camelCtx.start()
 
+    }
+
+    def testVariantSet() {
+        List variantSets = VariantSet.findAll()
+        System.out.println("num of variantSets: "+variantSets?.size())
+        for (VariantSet vs : variantSets) {
+            System.out.println("name: "+vs.name)
+        }
     }
 
     def destroy = {
