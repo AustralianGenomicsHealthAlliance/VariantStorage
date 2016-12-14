@@ -4,7 +4,7 @@
 <html>
 <head>
     <meta name="layout" content="main"/>
-    <title>VariantSet for ${variantSet.name?.encodeAsHTML()} </title>
+    <title>ReadGroupSet for ${readGroupSet.name?.encodeAsHTML()} </title>
 
     <asset:link rel="icon" href="favicon.ico" type="image/x-ico" />
 </head>
@@ -13,12 +13,16 @@
 
 <div id="content" role="main">
     <section class="row colset-2-its">
-        <h1>Data files for ${variantSet.name?.encodeAsHTML()}</h1>
+        <h1>BAM files for ${readGroupSet.name?.encodeAsHTML()}</h1>
 
-        <div>Reference Set ID: ${variantSet.referencesetId}</div>
+        <div>Reference Set ID: ${readGroupSet.referenceSetId}</div>
+
+        <div>Stats: ${readGroupSet.stats?.encodeAsHTML()}</div>
+
+        <div>Program: ${readGroupSet.programs?.encodeAsHTML()}</div>
 
         <div>
-            <g:link controller="download" action="variantSet" params="[id: variantSet.id]">
+            <g:link controller="download" action="readGroupSet" params="[id: readGroupSet.id]">
                 Download all files
             </g:link>
         </div>

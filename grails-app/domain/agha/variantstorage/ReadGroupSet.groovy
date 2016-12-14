@@ -13,6 +13,7 @@ class ReadGroupSet {
         datasetId column: 'datasetId'
         referenceSetId column: 'referenceSetId'
         dataUrl column: 'dataUrl'
+        indexFile column: 'indexFile'
     }
 
     static constraints = {
@@ -23,4 +24,7 @@ class ReadGroupSet {
     String datasetId
     String referenceSetId
     String dataUrl
+    String stats
+    String programs
+    String indexFile
 }

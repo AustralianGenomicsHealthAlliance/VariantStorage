@@ -20,15 +20,30 @@
                 <tr>
                    <th>Sample name</th>
                     <th>Variant Set ID</th>
+                    <th>VCFs</th>
+                    <th>BAMs</th>
                 </tr>
                 <g:each in="${CallSet.findAll(sort:'name')}" var="callset">
                     <tr>
                         <td>
-                            <g:link controller="variantSet" action="show" params="[id: callset.variantSetId]">
+
                             ${callset.name}
-                            </g:link>
+
                         </td>
                         <td>${callset.variantSetId}</td>
+                        <td>
+                            <g:link controller="variantSet" action="show" params="[id: callset.variantSetId]">
+                                VCFs
+                            </g:link>
+                        </td>
+                        <td>
+                            <g:set var="readGroupSet" value="${mapCallSetIdToReadGroupSet.get(callset.id)}" />
+                            <g:if test="${readGroupSet}">
+                                <g:link controller="readGroupSet" action="show" params="[id: readGroupSet.id]">
+                                    BAMs
+                                </g:link>
+                            </g:if>
+                        </td>
                     </tr>
                 </g:each>
             </table>

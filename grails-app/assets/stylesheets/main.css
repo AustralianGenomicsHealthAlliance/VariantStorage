@@ -84,7 +84,7 @@ img {
 }
 
 .footer {
-    background: #48802c;
+    background: #253A53;
     color: #000;
     clear: both;
     font-size: 0.8em;
@@ -561,10 +561,10 @@ a.skip {
 }
 
 .grails-logo-container {
-    background:#79b94c no-repeat 50% 30%;
+    /*background:#79b94c no-repeat 50% 30%;*/
     margin-bottom: 20px;
     color: white;
-    height:300px;
+    height:150px;
     text-align:center;
 }
 

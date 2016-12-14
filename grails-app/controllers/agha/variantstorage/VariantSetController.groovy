@@ -13,15 +13,15 @@ class VariantSetController {
 
         // Parse out the list of filenames associated with this VariantSet
         List<String> filePaths = vs.parseFilePaths()
-        List<String> fileNames = []
+        List<File> files = []
         if (filePaths) {
             for (String filePath : filePaths) {
                 File file = new File(filePath)
-                fileNames << file.name
+                files << file
             }
         }
 
 
-        respond vs, model: [files: fileNames]
+        respond vs, model: [files: files]
     }
 }

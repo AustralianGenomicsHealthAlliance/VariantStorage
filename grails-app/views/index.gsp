@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta name="layout" content="main"/>
-    <title>Welcome to Grails</title>
+    <title>Welcome to Variant Storage</title>
 
     <asset:link rel="icon" href="favicon.ico" type="image/x-ico" />
 </head>
@@ -47,33 +47,33 @@
 
     <div class="svg" role="presentation">
         <div class="grails-logo-container">
-            <asset:image src="grails-cupsonly-logo-white.svg" class="grails-logo"/>
+            <asset:image src="dna.jpg" />
         </div>
+
+        <div id="content" role="main">
+            <section class="row colset-2-its" style="background: rgba(255,255,255,0.7)">
+                <h1>Welcome to Variant Storage</h1>
+
+                <p>
+                    A Variant Storage database with a GA4GH server backend as a register for downloading VCF and BAM files.
+                </p>
+                <p>
+                    Getting started:
+                    <g:link controller="callSet" >
+                        View all Samples
+                    </g:link>
+
+                </p>
+
+
+            </section>
+        </div>
+
     </div>
 
-    <div id="content" role="main">
-        <section class="row colset-2-its">
-            <h1>Welcome to Grails</h1>
 
-            <p>
-                Congratulations, you have successfully started your first Grails application! At the moment
-                this is the default page, feel free to modify it to either redirect to a controller or display
-                whatever content you may choose. Below is a list of controllers that are currently deployed in
-                this application, click on each to execute its default action:
-            </p>
 
-            <div id="controllers" role="navigation">
-                <h2>Available Controllers:</h2>
-                <ul>
-                    <g:each var="c" in="${grailsApplication.controllerClasses.sort { it.fullName } }">
-                        <li class="controller">
-                            <g:link controller="${c.logicalPropertyName}">${c.fullName}</g:link>
-                        </li>
-                    </g:each>
-                </ul>
-            </div>
-        </section>
-    </div>
+
 
 </body>
 </html>
