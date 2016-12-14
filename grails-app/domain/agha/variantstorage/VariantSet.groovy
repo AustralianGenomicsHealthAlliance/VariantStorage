@@ -3,6 +3,10 @@ package agha.variantstorage
 import grails.converters.JSON
 import org.grails.web.json.JSONObject
 
+/**
+ * VariantSet domain class for GA4GH database
+ * @author Philip Wu
+ */
 class VariantSet {
 
     //Logger logger = Logger.getLogger(VariantSet.class)

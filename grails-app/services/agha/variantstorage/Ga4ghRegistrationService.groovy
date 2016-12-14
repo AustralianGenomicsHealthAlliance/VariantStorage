@@ -3,6 +3,10 @@ package agha.variantstorage
 import agha.cli.CliExec
 import grails.transaction.Transactional
 import groovy.io.FileType
+import htsjdk.samtools.SAMFileHeader
+import htsjdk.samtools.SAMReadGroupRecord
+import htsjdk.samtools.SamReader
+import htsjdk.samtools.SamReaderFactory
 import htsjdk.variant.vcf.VCFFileReader
 import htsjdk.variant.vcf.VCFHeader
 import org.apache.camel.Exchange
@@ -39,31 +43,69 @@ class Ga4ghRegistrationService {
         }
         if (dataset == null) {
             addDataset(datasetName)
-        } else {
-
+            Dataset.withTransaction  {
+                dataset = Dataset.findByName(datasetName)
+            }
         }
 
-        // VARAINT SETs
+        assert(dataset != null)
+        logger.info("datasetId="+dataset.id)
+
+        // VARAINT SETs (vcfs)
         // Group VCFs by sample name
-        Map<String, List> mapSampleNameToVcfs =  mapSampleNameToVcfs(yamlObj.vcfFolder)
+        if (yamlObj.vcfFolder) {
+            logger.info("Processing vcfFolder: "+yamlObj.vcfFolder)
+            Map<String, List> mapSampleNameToVcfs = mapSampleNameToVcfs(yamlObj.vcfFolder)
 
-        // Bgzip the entire folder
-        bgzipFolder(yamlObj.vcfFolder)
-        // Tabix the entire folder
-        tabixFolder(yamlObj.vcfFolder)
+            // Bgzip the entire folder
+            bgzipFolder(yamlObj.vcfFolder)
+            // Tabix the entire folder
+            tabixFolder(yamlObj.vcfFolder)
 
-        logger.info("vcfFolder: "+yamlObj.vcfFolder)
-        logger.info("referencesetName: "+yamlObj.assembly)
-        for (Map.Entry entry: mapSampleNameToVcfs.entrySet()) {
-            String sampleName = entry.key
-            List vcfs = entry.value
+            logger.info("vcfFolder: " + yamlObj.vcfFolder)
+            logger.info("referencesetName: " + yamlObj.assembly)
+            for (Map.Entry entry : mapSampleNameToVcfs.entrySet()) {
+                String sampleName = entry.key
+                List vcfs = entry.value
 
-            List vcfsBgzipped = vcfs.collect { it+".gz"}
-            logger.info("vcfsBgzipped: "+vcfsBgzipped)
+                List vcfsBgzipped = vcfs.collect { it + ".gz" }
+                logger.info("vcfsBgzipped: " + vcfsBgzipped)
 
-            addVariantSet(sampleName, datasetName, vcfsBgzipped, yamlObj.assembly)
+                // Check that the variant set doesn't already exist with the same name
+                VariantSet vs = null
+                VariantSet.withTransaction {
+                    vs = VariantSet.findByDatasetIdAndName(dataset.id, sampleName)
+                }
+                if (vs == null) {
+                    addVariantSet(sampleName, datasetName, vcfsBgzipped, yamlObj.assembly)
+                } else {
+                    logger.info("VariantSet already exists. No action taken.")
+                }
+            }
         }
 
+        // Read Group sets (BAMs)
+        if (yamlObj.bamFolder) {
+
+            Map<String, String> mapSampleNameToBams = mapSampleNameToBams(yamlObj.bamFolder)
+            logger.info("mapSampleNameToBams: "+mapSampleNameToBams)
+            for (Map.Entry entry: mapSampleNameToBams.entrySet()) {
+                String sampleName = entry.key
+                String bamPath = entry.value
+
+                // Check that the readgroupset doesn't already exist with the same name
+                ReadGroupSet readGroupSet = null
+                ReadGroupSet.withTransaction {
+                    readGroupSet = ReadGroupSet.findByDatasetIdAndName(dataset.id, sampleName)
+                }
+                logger.info("readGroupSet="+readGroupSet)
+                if (readGroupSet == null) {
+                    addReadGroupSet(datasetName, bamPath, yamlObj.assembly)
+                } else {
+                    logger.warn("ReadGroupSet already exists: "+bamPath+". No action taken.")
+                }
+            }
+        }
 
     }
 
@@ -110,7 +152,7 @@ class Ga4ghRegistrationService {
     }
 
     /**
-     * Add a variantset
+     * Add a variantset to the GA4GH server
      * @param name
      * @param vcfFolder
      * @param referencesetName
@@ -127,10 +169,24 @@ class Ga4ghRegistrationService {
 
     }
 
+    /**
+     * Adds a readgroupset to the GA4GH server
+     * @param datasetName
+     * @param bamPath
+     * @param referencesetName
+     */
+    public void addReadGroupSet(String datasetName, String bamPath, String referencesetName) {
+        bamPath = bamPath.replaceAll(" ","\\ ") // Escape spaces
+        String command = grailsApplication.config.ga4gh_repo.path + "/ga4gh_repo add-readgroupset "+grailsApplication.config.ga4gh_repo.registry+" "+datasetName+" -R "+referencesetName+" "+bamPath
+        logger.info("executing command: "+command)
+        String response = CliExec.execCommand(command)
+        logger.info("response: "+response)
+    }
+
     public void bgzipFolder(String folder) {
         // Only bgzip folder if VCF files exist. If we don't check, then an error is thrown.
         String[] lsCommand = ['sh', '-c', 'ls *.vcf']
-        String lsResponse = CliExec.execCommand(lsCommand, new File(folder))
+        String lsResponse = CliExec.execCommand(lsCommand, new File(folder), null, true, true)
         logger.info("lsResponse: "+lsResponse)
 
         if (lsResponse) {
@@ -155,4 +211,35 @@ class Ga4ghRegistrationService {
             CliExec.execCommand(shellTabixCommand, new File(folder))
         //}
     }
+
+    /**
+     * Map sample name to BAM files
+     * @param strBamFolder
+     * @return
+     */
+    public Map<String,String> mapSampleNameToBams(String strBamFolder) {
+
+        Map<String, String> mapSampleNameToBams = [:]
+
+        File bamFolder = new File(strBamFolder)
+
+        // Find all the VCFs in the folder
+        bamFolder.eachFileMatch(FileType.ANY, ~/.*\.bam/) { file ->
+            logger.info("File: "+file.name)
+            SamReader samReader = SamReaderFactory.makeDefault().open(file)
+            SAMFileHeader fileHeader = samReader.getFileHeader()
+
+            List<SAMReadGroupRecord> readGroups = fileHeader.getReadGroups()
+            if (readGroups) {
+                for (SAMReadGroupRecord readGroup: readGroups) {
+                    String sample = readGroup.getSample()
+                    logger.info("sample: "+sample)
+                    mapSampleNameToBams.put(sample, file.absolutePath)
+                }
+            }
+        }
+
+        return mapSampleNameToBams
+    }
+
 }
