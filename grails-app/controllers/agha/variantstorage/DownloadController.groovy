@@ -1,9 +1,13 @@
 package agha.variantstorage
 
+import org.apache.log4j.Logger
+
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 class DownloadController {
+
+    Logger logger = Logger.getLogger(DownloadController.class)
 
     def index() { }
 
@@ -13,27 +17,30 @@ class DownloadController {
     def variantSet() {
         VariantSet vs = VariantSet.findById(params.id)
 
+        String filename = vs.name+".zip"
+        logger.info("filename: "+filename)
+        response.setContentType('APPLICATION/OCTET-STREAM')
+        response.setHeader("Content-Disposition", "Attachment;Filename="+filename)
+
+
         // Parse out the list of filenames associated with this VariantSet
         List<String> filePaths = vs.parseFilePaths()
 
         // Compress the files into a single file for download
         ZipOutputStream zipFile = new ZipOutputStream(response.outputStream)
         for (String filePath: filePaths) {
+            logger.info("Adding to zip file: "+filePath)
             File file = new File(filePath)
             zipFile.putNextEntry(new ZipEntry(file.getName()))
             def buffer = new byte[1024]
             file.withInputStream { i ->
-                def l = i.read(buffer)
-                if (l > 0) {
-                    zipFile.write(buffer, 0, l)
-                }
+                zipFile << i
             }
             zipFile.closeEntry()
         }
-        //zipFile.close()
+        zipFile.close()
 
-        String filename = vs.name+".zip"
-        response.setHeader("Content-disposition", "filename=${fileName}")
+
         response.outputStream.flush()
     }
 }

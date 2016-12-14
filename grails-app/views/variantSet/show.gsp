@@ -17,6 +17,12 @@
 
         <div>Reference Set ID: ${variantSet.referencesetId}</div>
 
+        <div>
+            <g:link controller="download" action="variantSet" params="[id: variantSet.id]">
+                Download all files
+            </g:link>
+        </div>
+
         <fieldset>
             <legend>Files</legend>
 

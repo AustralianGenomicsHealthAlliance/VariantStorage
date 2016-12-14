@@ -16,7 +16,8 @@ class VariantSetController {
         List<String> fileNames = []
         if (filePaths) {
             for (String filePath : filePaths) {
-                fileNames << filePath
+                File file = new File(filePath)
+                fileNames << file.name
             }
         }
 

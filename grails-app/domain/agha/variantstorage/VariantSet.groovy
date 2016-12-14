@@ -1,12 +1,11 @@
 package agha.variantstorage
 
 import grails.converters.JSON
-import org.apache.log4j.Logger
 import org.grails.web.json.JSONObject
 
 class VariantSet {
 
-    Logger logger = Logger.getLogger(VariantSet.class)
+    //Logger logger = Logger.getLogger(VariantSet.class)
 
     static mapping = {
         table "VariantSet"
@@ -29,12 +28,12 @@ class VariantSet {
     public List<String> parseFilePaths() {
         List<String> fileNames = []
         if (this.dataUrlIndexMap) {
-            JSONObject filesMap =  JSON.parse(vs.dataUrlIndexMap)
+            JSONObject filesMap =  JSON.parse(this.dataUrlIndexMap)
             for (Iterator iter = filesMap.iterator(); iter.hasNext(); ) {
                 def chrMap = iter.next()
-                logger.info("chrMap="+chrMap)
+                //logger.info("chrMap="+chrMap)
                 def files = chrMap.value
-                logger.info("files="+files)
+                //logger.info("files="+files)
 
                 for (String filePath: files ) {
                     fileNames << filePath
