@@ -1,7 +1,9 @@
 package agha.variantstorage
 
 import org.apache.log4j.Logger
+import grails.plugin.springsecurity.annotation.Secured
 
+@Secured(value=["IS_AUTHENTICATED_FULLY"])
 class CallSetController {
 
     Logger logger = Logger.getLogger(CallSetController.class)

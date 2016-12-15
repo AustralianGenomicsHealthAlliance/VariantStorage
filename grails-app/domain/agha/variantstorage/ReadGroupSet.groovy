@@ -8,6 +8,7 @@ package agha.variantstorage
 class ReadGroupSet {
 
     static mapping = {
+        datasource 'ga4gh'
         table "ReadGroupSet"
         version false
         datasetId column: 'datasetId'

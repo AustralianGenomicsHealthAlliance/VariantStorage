@@ -12,6 +12,7 @@ class VariantSet {
     //Logger logger = Logger.getLogger(VariantSet.class)
 
     static mapping = {
+        datasource 'ga4gh'
         table "VariantSet"
         version false
         datasetId column: 'datasetId'

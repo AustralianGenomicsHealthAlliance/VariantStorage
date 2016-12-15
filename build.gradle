@@ -65,6 +65,13 @@ dependencies {
 
     // HTS JDK
     compile 'com.github.samtools:htsjdk:2.8.1'
+
+    // Spring security
+    compile 'org.grails.plugins:spring-security-core:3.1.1'
+
+    // Postgres
+    compile 'postgresql:postgresql:9.1-901.jdbc4'
+    //runtime "org.postgresql:postgresql:9.4.1208.jre8"
 }
 
 bootRun {

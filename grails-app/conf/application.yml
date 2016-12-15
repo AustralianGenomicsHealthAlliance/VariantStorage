@@ -88,20 +88,34 @@ hibernate:
         use_query_cache: false
         region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
 
+dataSources:
+    ga4gh:
+        dbCreate: "none"
+        url: "jdbc:sqlite:registry.db"
+        logSql: "false"
+        dialect: "org.hibernate.dialect.SQLiteDialect"
+        driverClassName: "org.sqlite.JDBC"
+        readOnly: "true"
 
-dataSource:
-    dbCreate: "none"
-    url: "jdbc:sqlite:/home/philip/ga4gh-server-env/registry.db"
-    logSql: "true"
-    dialect: "org.hibernate.dialect.SQLiteDialect"
-    driverClassName: "org.sqlite.JDBC"
-    readOnly: "true"
+    dataSource:
+        driverClassName: "org.postgresql.Driver"
+        pooled: true
+        dbCreate: "update"
+        url: "jdbc:postgresql://localhost:5432/ga4gh_frontend"
+
 
 environments:
     development:
-        dataSource:
-            dbCreate: "none"
-            url: "jdbc:sqlite:/home/philip/ga4gh-server-env/registry.db"
+        dataSources:
+            ga4gh:
+                dbCreate: "none"
+                url: "jdbc:sqlite:registry.db"
+            dataSource:
+                driverClassName: "org.postgresql.Driver"
+                dbCreate: "update"
+                url: "jdbc:postgresql://localhost:5432/ga4gh_frontend"
+                username: "postgres"
+                password: "postgres"
     test:
         dataSource:
             dbCreate: "none"
@@ -132,7 +146,7 @@ environments:
 environments:
   development:
     ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
-    ga4gh_repo.registry: "/home/philip/ga4gh-server-env/registry.db"
+    ga4gh_repo.registry: "C:/Users/Philip/git/VariantStorage/registry.db"
   production:
     ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
     ga4gh_repo.registry: "/home/philip/ga4gh-server-env/registry.db"

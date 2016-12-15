@@ -3,6 +3,7 @@ package agha.variantstorage
 class CallSet {
 
     static mapping = {
+        datasource 'ga4gh'
         table "CallSet"
         version false
 
