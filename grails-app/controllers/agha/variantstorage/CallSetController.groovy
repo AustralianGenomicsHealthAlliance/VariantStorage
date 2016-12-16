@@ -13,6 +13,8 @@ class CallSetController {
         // Map each callset to a readGroupSet
         Map<String, ReadGroupSet> mapCallSetIdToReadGroupSet = [:]
 
+        List<CallSet> callSets = []
+
         CallSet.withTransaction{
             for (CallSet callSet: CallSet.findAll()) {
                 VariantSet vs = VariantSet.findById(callSet.variantSetId)
@@ -24,9 +26,11 @@ class CallSetController {
                     }
                 }
             }
+
+            callSets = CallSet.findAll(sort:'name')
         }
         logger.info("mapCallSetIdToReadGroupSet: "+mapCallSetIdToReadGroupSet)
 
-        [mapCallSetIdToReadGroupSet: mapCallSetIdToReadGroupSet]
+        [mapCallSetIdToReadGroupSet: mapCallSetIdToReadGroupSet, callSets: callSets]
     }
 }

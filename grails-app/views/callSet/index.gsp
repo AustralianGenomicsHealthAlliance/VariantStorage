@@ -23,7 +23,7 @@
                     <th>VCFs</th>
                     <th>BAMs</th>
                 </tr>
-                <g:each in="${CallSet.findAll(sort:'name')}" var="callset">
+                <g:each in="${callsets}" var="callset">
                     <tr>
                         <td>
 

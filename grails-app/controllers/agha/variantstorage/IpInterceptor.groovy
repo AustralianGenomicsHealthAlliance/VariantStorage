@@ -1,0 +1,35 @@
+package agha.variantstorage
+
+class IpInterceptor {
+
+    Logger logger = Logger.getLogger(IpInterceptor.class)
+
+    boolean before() {
+
+        //logger.info("ipFilter")
+
+        Boolean valid = false
+
+        if (Environment.current == Environment.DEVELOPMENT) {
+            valid = true
+        } else {
+            List ipConfigs = IpConfig.findAll()
+            valid = IpAddressHelper.validateIpFromRequest(request, ipConfigs)
+      //      logger.info('valid=' + valid)
+            if(!valid){
+                render (status: HttpServletResponse.SC_FORBIDDEN, text: 'ERROR: Your IP address is not registered for access')
+                return false
+            }
+        }
+
+        return valid
+
+
+    }
+
+    boolean after() { true }
+
+    void afterView() {
+        // no-op
+    }
+}
