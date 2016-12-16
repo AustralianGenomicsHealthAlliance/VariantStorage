@@ -11,6 +11,12 @@ class User implements Serializable {
 
 	transient springSecurityService
 
+	static mapping = {
+		table '`user`'
+		password column: '`password`'
+
+	}
+
 	String username
 	String password
 	boolean enabled = true
@@ -41,9 +47,5 @@ class User implements Serializable {
 	static constraints = {
 		password blank: false, password: true
 		username blank: false, unique: true
-	}
-
-	static mapping = {
-		password column: '`password`'
 	}
 }
