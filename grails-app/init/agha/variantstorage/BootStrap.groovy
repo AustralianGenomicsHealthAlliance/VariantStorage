@@ -11,6 +11,7 @@ class BootStrap {
 
     Ga4ghRegistrationService ga4ghRegistrationService
     CamelContext camelCtx
+    def grailsApplication
 
     def init = { servletContext ->
         System.out.println("init out")
@@ -57,7 +58,7 @@ class BootStrap {
         camelCtx.addRoutes( new RouteBuilder() {
             @Override
             void configure() throws Exception {
-                from("file:/home/philip/ga4gh_registration?move=archived")
+                from(grailsApplication.config.camel.import)
                     .choice()
                         .when(header("CamelFileName").endsWith(".yml"))
                             .unmarshal()
