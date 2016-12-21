@@ -20,9 +20,9 @@ class IpInterceptor {
 
         Boolean valid = false
 
-//        if (Environment.current == Environment.DEVELOPMENT) {
-//            valid = true
-//        } else {
+        if (Environment.current == Environment.DEVELOPMENT) {
+            valid = true
+        } else {
             List ipConfigs = IpConfig.findAll()
             valid = IpAddressHelper.validateIpFromRequest(request, ipConfigs)
             logger.info('valid=' + valid)
@@ -30,7 +30,7 @@ class IpInterceptor {
                 render (status: HttpServletResponse.SC_FORBIDDEN, text: 'ERROR: Your IP address is not registered for access')
                 return false
             }
-//        }
+        }
 
         return valid
 

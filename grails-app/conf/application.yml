@@ -76,6 +76,7 @@ grails:
                 scriptlets: html
                 taglib: none
                 staticparts: none
+
 endpoints:
     jmx:
         unique-names: true
@@ -117,8 +118,17 @@ environments:
                 username: "postgres"
                 password: "postgres"
     test:
-        dataSource:
-            dbCreate: "none"
+        dataSources:
+            ga4gh:
+                dbCreate: "none"
+                url: "jdbc:sqlite:/mnt/ga4gh/registry.db"
+            dataSource:
+                driverClassName: "org.postgresql.Driver"
+                dbCreate: "update"
+                url: "jdbc:postgresql://localhost:5432/ga4gh_frontend"
+                username: "agha"
+                password: "changeme"
+
 
     production:
         dataSource:
@@ -147,6 +157,11 @@ environments:
   development:
     ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
     ga4gh_repo.registry: "C:/Users/Philip/git/VariantStorage/registry.db"
+  test:
+    grails.serverURL: "https://130.56.244.154/ga4gh_frontend"
+    ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
+    ga4gh_repo.registry: "/mnt/ga4gh/registry.db"
   production:
     ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
     ga4gh_repo.registry: "/home/philip/ga4gh-server-env/registry.db"
+

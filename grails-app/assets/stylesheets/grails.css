@@ -40,7 +40,7 @@ pre {
     text-decoration: none;
 }
 .grails-icon img {
-    width: 40px;
+    width: 180px;
 
 }
 .navbar-default, .navbar-static-top {
@@ -962,7 +962,7 @@ html, body, .st-container, .st-pusher, .st-content {
     display: block;
     position: absolute;
     left: 12px;
-    top: 17px;
+    /*top: 17px;*/
     font-size: 20px;
     width: 30px;
     text-align: center

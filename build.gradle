@@ -13,6 +13,7 @@ buildscript {
 version "0.1"
 group "agha.variantstorage"
 
+
 apply plugin:"eclipse"
 apply plugin:"idea"
 apply plugin:"war"
@@ -81,4 +82,8 @@ bootRun {
 assets {
     minifyJs = true
     minifyCss = true
+}
+
+war {
+    archiveName="ga4gh_frontend.war"
 }

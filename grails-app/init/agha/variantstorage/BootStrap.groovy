@@ -15,6 +15,7 @@ class BootStrap {
     def init = { servletContext ->
         System.out.println("init out")
 
+        initSecurityRoles()
         initAdmin()
         initCamel()
         testVariantSet()
