@@ -59,8 +59,8 @@
                 </p>
                 <p>
                     Getting started:
-                    <g:link controller="callSet" >
-                        View all Samples
+                    <g:link controller="dataset" >
+                        View Cohorts
                     </g:link>
 
                 </p>
