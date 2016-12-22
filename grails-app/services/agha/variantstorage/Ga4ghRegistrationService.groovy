@@ -19,19 +19,15 @@ class Ga4ghRegistrationService {
     Logger logger = Logger.getLogger(Ga4ghRegistrationService.class)
 
     def grailsApplication
+    def sessionFactory
 
     /**
      * For use in camel integration
      * @param exchange
      * @return
      */
-    def registerDataset(Exchange exchange) {
-        String filename = exchange.getIn().getHeader("CamelFileName")
-
-        logger.info("registerDataset: "+filename)
-
-        def yamlObj = exchange.getIn().body
-        logger.info("body="+yamlObj)
+    def registerDataset(def yamlObj, SampleNameHandler sampleNameHandler = new DefaultSampleNameHandler()) {
+        logger.info("yaml="+yamlObj)
 
         //  DATASET
         // Only add the dataset if it doesn't already exist
@@ -43,8 +39,10 @@ class Ga4ghRegistrationService {
         }
         if (dataset == null) {
             addDataset(datasetName)
+
             Dataset.withTransaction  {
                 dataset = Dataset.findByName(datasetName)
+                logger.info("datasetId: "+dataset.id)
             }
         }
 
@@ -55,7 +53,7 @@ class Ga4ghRegistrationService {
         // Group VCFs by sample name
         if (yamlObj.vcfFolder) {
             logger.info("Processing vcfFolder: "+yamlObj.vcfFolder)
-            Map<String, List> mapSampleNameToVcfs = mapSampleNameToVcfs(yamlObj.vcfFolder)
+            Map<String, List> mapSampleNameToFiles = mapSampleNameToFiles(yamlObj.vcfFolder, sampleNameHandler)
 
             // Bgzip the entire folder
             bgzipFolder(yamlObj.vcfFolder)
@@ -64,12 +62,20 @@ class Ga4ghRegistrationService {
 
             logger.info("vcfFolder: " + yamlObj.vcfFolder)
             logger.info("referencesetName: " + yamlObj.assembly)
-            for (Map.Entry entry : mapSampleNameToVcfs.entrySet()) {
+            for (Map.Entry entry : mapSampleNameToFiles.entrySet()) {
                 String sampleName = entry.key
-                List vcfs = entry.value
+                List filePaths = entry.value
 
-                List vcfsBgzipped = vcfs.collect { it + ".gz" }
-                logger.info("vcfsBgzipped: " + vcfsBgzipped)
+                List bgzippedFiles = []
+                for (String filePath : filePaths) {
+                    if (filePath.endsWith(".gz")) {
+                        bgzippedFiles << filePath
+                    } else {
+                        bgzippedFiles << filePath+".gz"
+                    }
+                }
+
+                logger.info("bgzippedFiles: " + bgzippedFiles)
 
                 // Check that the variant set doesn't already exist with the same name
                 VariantSet vs = null
@@ -77,7 +83,7 @@ class Ga4ghRegistrationService {
                     vs = VariantSet.findByDatasetIdAndName(dataset.id, sampleName)
                 }
                 if (vs == null) {
-                    addVariantSet(sampleName, datasetName, vcfsBgzipped, yamlObj.assembly)
+                    addVariantSet(sampleName, datasetName, bgzippedFiles, yamlObj.assembly)
                 } else {
                     logger.info("VariantSet already exists. No action taken.")
                 }
@@ -86,24 +92,28 @@ class Ga4ghRegistrationService {
 
         // Read Group sets (BAMs)
         if (yamlObj.bamFolder) {
+            File bamFolderFile = new File(yamlObj.bamFolder)
+            if (bamFolderFile.exists()) {
+                Map<String, String> mapSampleNameToBams = mapSampleNameToBams(yamlObj.bamFolder)
+                logger.info("mapSampleNameToBams: " + mapSampleNameToBams)
+                for (Map.Entry entry : mapSampleNameToBams.entrySet()) {
+                    String sampleName = entry.key
+                    String bamPath = entry.value
 
-            Map<String, String> mapSampleNameToBams = mapSampleNameToBams(yamlObj.bamFolder)
-            logger.info("mapSampleNameToBams: "+mapSampleNameToBams)
-            for (Map.Entry entry: mapSampleNameToBams.entrySet()) {
-                String sampleName = entry.key
-                String bamPath = entry.value
-
-                // Check that the readgroupset doesn't already exist with the same name
-                ReadGroupSet readGroupSet = null
-                ReadGroupSet.withTransaction {
-                    readGroupSet = ReadGroupSet.findByDatasetIdAndName(dataset.id, sampleName)
+                    // Check that the readgroupset doesn't already exist with the same name
+                    ReadGroupSet readGroupSet = null
+                    ReadGroupSet.withTransaction {
+                        readGroupSet = ReadGroupSet.findByDatasetIdAndName(dataset.id, sampleName)
+                    }
+                    logger.info("readGroupSet=" + readGroupSet)
+                    if (readGroupSet == null) {
+                        addReadGroupSet(datasetName, bamPath, yamlObj.assembly)
+                    } else {
+                        logger.warn("ReadGroupSet already exists: " + bamPath + ". No action taken.")
+                    }
                 }
-                logger.info("readGroupSet="+readGroupSet)
-                if (readGroupSet == null) {
-                    addReadGroupSet(datasetName, bamPath, yamlObj.assembly)
-                } else {
-                    logger.warn("ReadGroupSet already exists: "+bamPath+". No action taken.")
-                }
+            } else {
+                logger.info("Skipping bam folder that does not exist: "+yamlObj.bamFolder)
             }
         }
 
@@ -114,7 +124,7 @@ class Ga4ghRegistrationService {
      * @param name
      */
     public void addDataset(String name) {
-        String command = grailsApplication.config.ga4gh_repo.path + "/ga4gh_repo add-dataset " + grailsApplication.config.ga4gh_repo.registry +" "+ name
+        String command = grailsApplication.config.ga4gh_repo.path + "/ga4gh_repo add-dataset " + getGa4ghRegistryPath() +" "+ name
         logger.info("executing command: "+command)
         String response = CliExec.execCommand(command)
         logger.info("response: "+response)
@@ -125,19 +135,18 @@ class Ga4ghRegistrationService {
      * @param strVcfFolder
      * @return
      */
-    public Map<String,List> mapSampleNameToVcfs(String strVcfFolder) {
+    public Map<String,List> mapSampleNameToFiles(String strVcfFolder, SampleNameHandler sampleNameHandler = new DefaultSampleNameHandler()) {
 
         Map<String, List> mapSampleNameToVcfs = [:]
 
         File vcfFolder = new File(strVcfFolder)
 
         // Find all the VCFs in the folder
-        vcfFolder.eachFileMatch(FileType.ANY, ~/.*\.vcf/) { file ->
+        vcfFolder.eachFileMatch(FileType.ANY, ~/.*\.vcf|.*\.gz/) { file ->
             logger.info("File: "+file.name)
-            VCFFileReader vcfFileReader = new VCFFileReader(file)
-            VCFHeader vcfHeader = vcfFileReader.getFileHeader()
-            logger.info("sample names: "+vcfHeader.getGenotypeSamples())
-            for (String sampleName : vcfHeader.getGenotypeSamples()) {
+
+            List<String> sampleNames = sampleNameHandler.getSampleNames(file)
+            for (String sampleName : sampleNames) {
                 List<String> vcfs = mapSampleNameToVcfs.get(sampleName)
                 if (vcfs == null) {
                     vcfs = []
@@ -161,7 +170,7 @@ class Ga4ghRegistrationService {
 
         String vcfsArgument = vcfs.join(" ")
 
-        String command = grailsApplication.config.ga4gh_repo.path + "/ga4gh_repo add-variantset " + grailsApplication.config.ga4gh_repo.registry+" "+datasetName+" "+vcfsArgument+" --name "+name+" --referenceSetName "+referencesetName
+        String command = grailsApplication.config.ga4gh_repo.path + "/ga4gh_repo add-variantset " + getGa4ghRegistryPath()+" "+datasetName+" "+vcfsArgument+" --name "+name+" --referenceSetName "+referencesetName
         logger.info("executing command: "+command)
         String response = CliExec.execCommand(command)
         logger.info("response: "+response)
@@ -177,7 +186,7 @@ class Ga4ghRegistrationService {
      */
     public void addReadGroupSet(String datasetName, String bamPath, String referencesetName) {
         bamPath = bamPath.replaceAll(" ","\\ ") // Escape spaces
-        String command = grailsApplication.config.ga4gh_repo.path + "/ga4gh_repo add-readgroupset "+grailsApplication.config.ga4gh_repo.registry+" "+datasetName+" -R "+referencesetName+" "+bamPath
+        String command = grailsApplication.config.ga4gh_repo.path + "/ga4gh_repo add-readgroupset "+getGa4ghRegistryPath()+" "+datasetName+" -R "+referencesetName+" "+bamPath
         logger.info("executing command: "+command)
         String response = CliExec.execCommand(command)
         logger.info("response: "+response)
@@ -240,6 +249,12 @@ class Ga4ghRegistrationService {
         }
 
         return mapSampleNameToBams
+    }
+
+    public String getGa4ghRegistryPath() {
+        String registryPath = grailsApplication.config.dataSources.ga4gh.url.replaceFirst("jdbc:sqlite:", "")
+        logger.info("registryPath: "+registryPath)
+        return registryPath
     }
 
 }

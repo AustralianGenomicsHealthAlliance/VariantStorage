@@ -82,6 +82,22 @@ endpoints:
         unique-names: true
 
 ---
+environments:
+  development:
+    ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
+#    ga4gh_repo.registry: "/home/philip/ga4gh-server-env/registry.db"
+    camel.import: "file:/home/philip/ga4gh_registration?move=archived"
+  test:
+    grails.serverURL: "https://130.56.244.154/ga4gh_frontend"
+    ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
+#    ga4gh_repo.registry: "/mnt/ga4gh/registry.db"
+    camel.import: "file:/mnt/ga4gh/camel?move=archived"
+  production:
+    ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
+#    ga4gh_repo.registry: "/home/philip/ga4gh-server-env/registry.db"
+    camel.import: "file:/home/philip/ga4gh_registration?move=archived"
+
+---
 hibernate:
     cache:
         queries: false
@@ -110,7 +126,7 @@ environments:
         dataSources:
             ga4gh:
                 dbCreate: "none"
-                url: "jdbc:sqlite:registry.db"
+                url: "jdbc:sqlite:/home/philip/ga4gh-server-env/registry.db"
             dataSource:
                 driverClassName: "org.postgresql.Driver"
                 dbCreate: "update"
@@ -152,19 +168,5 @@ environments:
                 jdbcInterceptors: ConnectionState
                 defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
 
----
-environments:
-  development:
-    ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
-    ga4gh_repo.registry: "C:/Users/Philip/git/VariantStorage/registry.db"
-    camel.import: "file:/home/philip/ga4gh_registration?move=archived"
-  test:
-    grails.serverURL: "https://130.56.244.154/ga4gh_frontend"
-    ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
-    ga4gh_repo.registry: "/mnt/ga4gh/registry.db"
-    camel.import: "file:/mnt/ga4gh/camel?move=archived"
-  production:
-    ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
-    ga4gh_repo.registry: "/home/philip/ga4gh-server-env/registry.db"
-    camel.import: "file:/home/philip/ga4gh_registration?move=archived"
+
 

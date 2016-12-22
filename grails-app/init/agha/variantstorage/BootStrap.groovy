@@ -11,6 +11,7 @@ class BootStrap {
 
     Ga4ghRegistrationService ga4ghRegistrationService
     CamelContext camelCtx
+    CpiRegistrationService cpiRegistrationService
     def grailsApplication
 
     def init = { servletContext ->
@@ -18,9 +19,10 @@ class BootStrap {
 
         initSecurityRoles()
         initAdmin()
-        initCamel()
-        testVariantSet()
+        //initCamel()
+        //testVariantSet()
 
+        cpiRegistrationService.registerVcfsBams()
     }
 
     def initAdmin() {
@@ -67,7 +69,13 @@ class BootStrap {
 
                                 @Override
                                 void process(Exchange exchange) throws Exception {
-                                    ga4ghRegistrationService.registerDataset(exchange)
+
+
+                                    String filename = exchange.getIn().getHeader("CamelFileName")
+                                    System.out.println("registerDataset: "+filename)
+                                    def yamlObj = exchange.getIn().body
+
+                                    ga4ghRegistrationService.registerDataset(yamlObj)
                                 }
 
                             })
