@@ -36,7 +36,7 @@
                         <td>${file.name?.encodeAsHTML()}</td>
                         <td>
                             <g:if test="file?.length()">
-                                ${ Math.round(file.length() / 1024 / 1024)} MB
+                                ${ Math.round(file.length() / 1024)} bytes
                             </g:if>
                         </td>
                     </tr>

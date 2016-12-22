@@ -15,9 +15,6 @@ class IpInterceptor {
     }
 
     boolean before() {
-
-        logger.info("ipFilter")
-
         Boolean valid = false
 
         if (Environment.current == Environment.DEVELOPMENT) {
@@ -32,6 +29,7 @@ class IpInterceptor {
             }
         }
 
+        logger.info("ipFilter valid="+valid)
         return valid
 
 

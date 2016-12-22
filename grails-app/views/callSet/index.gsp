@@ -19,18 +19,18 @@
             <table>
                 <tr>
                    <th>Sample name</th>
-                    <th>Variant Set ID</th>
+                    <th>Cohort</th>
                     <th>VCFs</th>
                     <th>BAMs</th>
                 </tr>
-                <g:each in="${callsets}" var="callset">
+                <g:each in="${callSets}" var="callset">
                     <tr>
                         <td>
 
-                            ${callset.name}
+                            ${callset.name?.encodeAsHTML()}
 
                         </td>
-                        <td>${callset.variantSetId}</td>
+                        <td>${callset.datasetName?.encodeAsHTML()}</td>
                         <td>
                             <g:link controller="variantSet" action="show" params="[id: callset.variantSetId]">
                                 VCFs

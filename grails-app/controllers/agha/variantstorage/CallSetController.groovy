@@ -16,7 +16,7 @@ class CallSetController {
         List<CallSet> callSets = []
 
         CallSet.withTransaction{
-            for (CallSet callSet: CallSet.findAll()) {
+            for (CallSet callSet: CallSet.findAll([max:50], {})) {
                 VariantSet vs = VariantSet.findById(callSet.variantSetId)
                 if (vs) {
                     // Based on the datasetId and the callset name, find the ReadGroupSet
@@ -29,6 +29,7 @@ class CallSetController {
 
             callSets = CallSet.findAll(sort:'name')
         }
+        logger.info("num callsets: "+callSets.size())
         logger.info("mapCallSetIdToReadGroupSet: "+mapCallSetIdToReadGroupSet)
 
         [mapCallSetIdToReadGroupSet: mapCallSetIdToReadGroupSet, callSets: callSets]
