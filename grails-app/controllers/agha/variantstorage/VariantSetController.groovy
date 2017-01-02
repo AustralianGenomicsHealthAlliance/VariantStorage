@@ -3,9 +3,11 @@ package agha.variantstorage
 import grails.converters.JSON
 import grails.plugin.springsecurity.annotation.Secured
 import org.apache.log4j.Logger
+import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 
 @Secured(value=["IS_AUTHENTICATED_FULLY"])
+//@Secured(['IS_AUTHENTICATED_ANONYMOUSLY'])
 class VariantSetController {
 
     Logger logger = Logger.getLogger(VariantSetController.class)
@@ -26,8 +28,35 @@ class VariantSetController {
             }
         }
 
+        withFormat {
+            html { respond vs, model: [files: files] }
+            json {
+                logger.info("Creating json response")
+                // Collect fields of interest into a Map for a JSON response
+                JSONObject json = new JSONObject()
 
-        respond vs, model: [files: files]
+                JSONObject variantSetJson = new JSONObject()
+                variantSetJson.put('id', vs.id)
+                variantSetJson.put('name', vs.name)
+                variantSetJson.put('datasetId', vs.datasetId)
+                json.put('variantSet', variantSetJson)
+
+                JSONArray filesJson = new JSONArray()
+
+                for (File file: files ) {
+                    JSONObject fileJson = new JSONObject()
+                    fileJson.put('name', file.name)
+                    fileJson.put('size', file.length())
+                    fileJson.put('absolutePath', file.absolutePath)
+
+                    filesJson.add(fileJson)
+                }
+
+                json.put('files', filesJson)
+
+                render json
+            }
+        }
     }
 
     def index() {

@@ -13,7 +13,10 @@ class ReadGroupSetController {
     Logger logger = Logger.getLogger(VariantSetController.class)
 
     def show() {
-        ReadGroupSet rgs = ReadGroupSet.findById(params.id)
+        ReadGroupSet rgs = null
+        ReadGroupSet.withTransaction {
+            rgs = ReadGroupSet.findById(params.id)
+        }
 
         File bamFile = new File(rgs.dataUrl)
         File indexFile = new File(rgs.indexFile)

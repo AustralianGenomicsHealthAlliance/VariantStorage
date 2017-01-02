@@ -1,10 +1,12 @@
 package agha.variantstorage
 
+import grails.plugin.springsecurity.annotation.Secured
 import org.apache.log4j.Logger
 
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
+@Secured(value=["IS_AUTHENTICATED_FULLY"])
 class DownloadController {
 
     Logger logger = Logger.getLogger(DownloadController.class)
