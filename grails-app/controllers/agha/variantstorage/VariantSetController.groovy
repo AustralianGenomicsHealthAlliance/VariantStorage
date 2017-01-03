@@ -6,8 +6,8 @@ import org.apache.log4j.Logger
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 
-//@Secured(value=["IS_AUTHENTICATED_FULLY"])
-@Secured(['IS_AUTHENTICATED_ANONYMOUSLY'])
+@Secured(value=["IS_AUTHENTICATED_FULLY"])
+//@Secured(['IS_AUTHENTICATED_ANONYMOUSLY'])
 class VariantSetController {
 
     Logger logger = Logger.getLogger(VariantSetController.class)
@@ -77,8 +77,10 @@ class VariantSetController {
                     JSONObject json = new JSONObject()
 
                     // Dataset details
-                    json.put("name", dataset.name)
-                    json.put("id", dataset.id)
+                    JSONObject datasetJson = new JSONObject()
+                    datasetJson.put("name", dataset.name)
+                    datasetJson.put("id", dataset.id)
+                    json.put('dataset', datasetJson)
 
                     JSONArray vsArray = new JSONArray()
                     json.put("variantSets", vsArray)

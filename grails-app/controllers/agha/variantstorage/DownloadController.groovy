@@ -36,7 +36,7 @@ class DownloadController {
     }
 
     /**
-     * Download all the files for a variant set
+     * Download all the files for a readgroup set
      */
     def readGroupSet() {
         ReadGroupSet rgs = ReadGroupSet.findById(params.id)

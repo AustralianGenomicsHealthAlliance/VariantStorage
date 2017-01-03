@@ -32,5 +32,6 @@ class DatasetController {
         }
 
         [datasets: datasets, variantSetMap: variantSetMap, readGroupSetMap: readGroupSetMap]
+
     }
 }
