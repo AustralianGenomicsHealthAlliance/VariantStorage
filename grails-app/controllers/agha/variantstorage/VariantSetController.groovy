@@ -6,8 +6,8 @@ import org.apache.log4j.Logger
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 
-@Secured(value=["IS_AUTHENTICATED_FULLY"])
-//@Secured(['IS_AUTHENTICATED_ANONYMOUSLY'])
+//@Secured(value=["IS_AUTHENTICATED_FULLY"])
+@Secured(['IS_AUTHENTICATED_ANONYMOUSLY'])
 class VariantSetController {
 
     Logger logger = Logger.getLogger(VariantSetController.class)
@@ -57,6 +57,45 @@ class VariantSetController {
                 render json
             }
         }
+    }
+
+    def list() {
+
+        // list by datasetId
+        if (params.datasetId) {
+
+            List variantSets = []
+            Dataset dataset = null
+
+            VariantSet.withTransaction {
+                variantSets = VariantSet.findAllByDatasetId(params.datasetId)
+                dataset = Dataset.findById(params.datasetId)
+            }
+
+            withFormat {
+                json {
+                    JSONObject json = new JSONObject()
+
+                    // Dataset details
+                    json.put("name", dataset.name)
+                    json.put("id", dataset.id)
+
+                    JSONArray vsArray = new JSONArray()
+                    json.put("variantSets", vsArray)
+
+                    for (VariantSet vs: variantSets) {
+                        JSONObject vsJson = new JSONObject()
+                        vsJson.put("name", vs.name )
+                        vsJson.put("id", vs.id)
+                        vsArray.add(vsJson)
+                    }
+
+                    render json
+                }
+            }
+
+        }
+
     }
 
     def index() {
