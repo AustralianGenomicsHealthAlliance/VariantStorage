@@ -17,43 +17,51 @@ class DownloadController {
      * Download all the files for a variant set
      */
     def variantSet() {
-        VariantSet vs = VariantSet.findById(params.id)
+        VariantSet vs = null
+        VariantSet.withTransaction {
+            vs = VariantSet.findById(params.id)
+        }
 
-        String filename = vs.name+".vcfs.zip"
-        logger.info("filename: "+filename)
-        response.setContentType('APPLICATION/OCTET-STREAM')
-        response.setHeader("Content-Disposition", "Attachment;Filename="+filename)
+        if (vs) {
+            String filename = vs.name + ".vcfs.zip"
+            logger.info("filename: " + filename)
+            response.setContentType('APPLICATION/OCTET-STREAM')
+            response.setHeader("Content-Disposition", "Attachment;Filename=" + filename)
+
+            // Parse out the list of filenames associated with this VariantSet
+            List<String> filePaths = vs.parseFilePaths()
+
+            // Compress the files into a single file for download
+            zipFiles(filePaths, response.outputStream)
 
 
-        // Parse out the list of filenames associated with this VariantSet
-        List<String> filePaths = vs.parseFilePaths()
-
-        // Compress the files into a single file for download
-        zipFiles(filePaths, response.outputStream)
-
-
-        response.outputStream.flush()
+            response.outputStream.flush()
+        }
     }
 
     /**
      * Download all the files for a readgroup set
      */
     def readGroupSet() {
-        ReadGroupSet rgs = ReadGroupSet.findById(params.id)
+        ReadGroupSet rgs = null
+        ReadGroupSet.withTransaction {
+            rgs = ReadGroupSet.findById(params.id)
+        }
 
-        String filename = rgs.name+".bam.zip"
-        logger.info("filename: "+filename)
-        response.setContentType('APPLICATION/OCTET-STREAM')
-        response.setHeader("Content-Disposition", "Attachment;Filename="+filename)
+        if (rgs) {
+            String filename = rgs.name + ".bam.zip"
+            logger.info("filename: " + filename)
+            response.setContentType('APPLICATION/OCTET-STREAM')
+            response.setHeader("Content-Disposition", "Attachment;Filename=" + filename)
+
+            // Parse out the list of filenames associated with this VariantSet
+            List<String> filePaths = [rgs.dataUrl, rgs.indexFile]
+
+            zipFiles(filePaths, response.outputStream)
 
 
-        // Parse out the list of filenames associated with this VariantSet
-        List<String> filePaths = [rgs.dataUrl, rgs.indexFile]
-
-        zipFiles(filePaths, response.outputStream)
-
-
-        response.outputStream.flush()
+            response.outputStream.flush()
+        }
     }
 
     /**

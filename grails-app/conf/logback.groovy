@@ -37,5 +37,6 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
     root(ERROR, ['FULL_STACKTRACE'])
 }
 else {
+    logger('agha', INFO, ['STDOUT'])
     root(ERROR, ['STDOUT'])
 }

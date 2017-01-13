@@ -1,6 +1,8 @@
 package agha.variantstorage
 
 import grails.plugin.springsecurity.annotation.Secured
+import org.grails.web.json.JSONArray
+import org.grails.web.json.JSONObject
 
 /**
  * Controller for viewing datasets (cohorts)
@@ -33,5 +35,22 @@ class DatasetController {
 
         [datasets: datasets, variantSetMap: variantSetMap, readGroupSetMap: readGroupSetMap]
 
+    }
+
+    def search() {
+        Dataset dataset = null
+        Dataset.withTransaction {
+            dataset = Dataset.findByName(params.name)
+        }
+
+        JSONObject json = new JSONObject()
+
+        if (dataset) {
+            // Dataset details
+            json.put("name", dataset.name)
+            json.put("id", dataset.id)
+        }
+
+        render json
     }
 }
