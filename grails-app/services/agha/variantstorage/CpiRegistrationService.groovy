@@ -22,11 +22,19 @@ class CpiRegistrationService {
         // Recursively search folders
         new File(fileRoot).eachDirRecurse() { dir ->
             if (dir.name.endsWith("_snvcalls")) {
-                String datasetName = dir.parentFile.name
+                String cohortName = dir.parentFile.name
                 String vcfFolder = dir.absolutePath
                 String assembly = "GRCh37"
                 String bamFolder = dir.parentFile.absolutePath + "/bam_links"
 
+                String pipelineVersion = getPipelineVersion(dir)
+
+                String datasetName = cohortName
+                if (pipelineVersion) {
+                    datasetName += '_' + pipelineVersion
+                }
+
+                logger.info("pipelineVersion="+pipelineVersion)
                 logger.info("datasetName="+datasetName)
                 logger.info("vcfFolder="+vcfFolder)
                 logger.info("bamFolder="+bamFolder)
@@ -55,6 +63,24 @@ class CpiRegistrationService {
 
         }
 
+    }
+
+    /**
+     * Recursively move up one folder until the version is found starting with the character 'v'
+     * @param file
+     * @return
+     */
+    public String getPipelineVersion(File file) {
+        if (file) {
+            File parentFile = file.getParentFile()
+            logger.info("parentFile="+parentFile)
+            if (parentFile && parentFile.name.toLowerCase().startsWith('v')) {
+                return parentFile.name
+            } else {
+                return getPipelineVersion(parentFile)
+            }
+        }
+        return ''
     }
 
     class YamlObject {
