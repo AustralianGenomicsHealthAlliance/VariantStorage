@@ -14,11 +14,13 @@ class CpiRegistrationService {
     Logger logger = Logger.getLogger(CpiRegistrationService.class)
 
     Ga4ghRegistrationService ga4ghRegistrationService
+    def grailsApplication
 
     public void registerVcfsBams() {
+        String fileRoot = grailsApplication.config.existing.files.root
 
         // Recursively search folders
-        new File("/home/philip/ga4gh-server-env/cpi_datasets").eachDirRecurse() { dir ->
+        new File(fileRoot).eachDirRecurse() { dir ->
             if (dir.name.endsWith("_snvcalls")) {
                 String datasetName = dir.parentFile.name
                 String vcfFolder = dir.absolutePath
@@ -43,7 +45,7 @@ class CpiRegistrationService {
                         List sampleNames = []
 
                         sampleNames << file.name.split(("\\."))[0]
-                        logger.info("sampleNames: "+sampleNames)
+                        //logger.info("sampleNames: "+sampleNames)
                         return sampleNames
                     }
                 }

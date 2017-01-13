@@ -117,6 +117,7 @@ class Ga4ghRegistrationService {
             }
         }
 
+        logger.info("dataset registered: "+yamlObj)
     }
 
     /**
@@ -214,11 +215,24 @@ class Ga4ghRegistrationService {
         //String lsResponse = CliExec.execCommand(lsCommand, new File(folder))
         //logger.info("lsResponse: "+lsResponse)
 
-        //if (lsResponse) {
-            String tabixCommand = 'for i in *.gz; do tabix -f \$i; done'
-            String[] shellTabixCommand = ['sh', '-c', tabixCommand]
-            CliExec.execCommand(shellTabixCommand, new File(folder))
-        //}
+        // Check that each bgzipped file has a matching tabix file
+        new File(folder).eachFileMatch(FileType.ANY, ~/.*\.gz/) { file ->
+            String strTabixFile = file.absolutePath + '.tbi'
+            File tabixFile = new File(strTabixFile)
+            // Check if it exists
+            if ( ! tabixFile.exists()) {
+                // Run command to tabix
+                String tabixCommand = 'tabix -f ' + file.absolutePath
+                String[] shellTabixCommand = ['sh', '-c', tabixCommand]
+                CliExec.execCommand(shellTabixCommand, new File(folder))
+            }
+        }
+
+
+//        String tabixCommand = 'for i in *.gz; do tabix -f \$i; done'
+//        String[] shellTabixCommand = ['sh', '-c', tabixCommand]
+//        CliExec.execCommand(shellTabixCommand, new File(folder))
+
     }
 
     /**
@@ -242,7 +256,7 @@ class Ga4ghRegistrationService {
             if (readGroups) {
                 for (SAMReadGroupRecord readGroup: readGroups) {
                     String sample = readGroup.getSample()
-                    logger.info("sample: "+sample)
+                    //logger.info("sample: "+sample)
                     mapSampleNameToBams.put(sample, file.absolutePath)
                 }
             }

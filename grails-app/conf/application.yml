@@ -87,15 +87,18 @@ environments:
     ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
 #    ga4gh_repo.registry: "/home/philip/ga4gh-server-env/registry.db"
     camel.import: "file:/home/philip/ga4gh_registration?move=archived"
+    existing.files.root: "/home/philip/ga4gh-server-env/cpi_datasets"
   test:
     grails.serverURL: "https://130.56.244.154/ga4gh_frontend"
-    ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
+    ga4gh_repo.path: "/mnt/ga4gh/ga4gh-server-env/bin"
 #    ga4gh_repo.registry: "/mnt/ga4gh/registry.db"
-    camel.import: "file:/mnt/ga4gh/camel?move=archived"
+    camel.import: "file:/mnt/u86_nfs/camel?move=archived"
+    existing.files.root: "/mnt/u86_nfs/variantdb/runs/v2.3/human_single_gatk/APOSLE_single140"
   production:
     ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
 #    ga4gh_repo.registry: "/home/philip/ga4gh-server-env/registry.db"
     camel.import: "file:/home/philip/ga4gh_registration?move=archived"
+    existing.files.root: "/home/philip/ga4gh-server-env/cpi_datasets"
 
 ---
 hibernate:

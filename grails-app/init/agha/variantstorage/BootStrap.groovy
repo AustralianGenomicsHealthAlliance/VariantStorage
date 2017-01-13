@@ -22,7 +22,7 @@ class BootStrap {
         //initCamel()
         //testVariantSet()
 
-        //cpiRegistrationService.registerVcfsBams()
+        cpiRegistrationService.registerVcfsBams()
     }
 
     def initAdmin() {
@@ -54,6 +54,7 @@ class BootStrap {
     }
 
     def initCamel() {
+        System.out.println("Listening to folder: "+grailsApplication.config.camel.import)
 
         camelCtx = new DefaultCamelContext()
 
@@ -82,7 +83,7 @@ class BootStrap {
                         .otherwise()
                             .log("Bad registration file: "+header("CamelFileName"))
                     .end()
-                        //.to("file:/home/philip/ga4gh_registration_archive")
+                        //.to(grailsApplication.config.camel.import+'/archived')
             }
         } )
 
