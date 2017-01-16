@@ -82,6 +82,9 @@ endpoints:
         unique-names: true
 
 ---
+# Dataset names and variant set names to be uppercased?
+uppercase.names: true
+
 environments:
   development:
     ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"

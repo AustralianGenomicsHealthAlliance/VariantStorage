@@ -34,6 +34,9 @@ class CpiRegistrationService {
                     datasetName += '_' + pipelineVersion
                 }
 
+                // Uppercase datasetName
+                datasetName = datasetName.toUpperCase()
+
                 logger.info("pipelineVersion="+pipelineVersion)
                 logger.info("datasetName="+datasetName)
                 logger.info("vcfFolder="+vcfFolder)

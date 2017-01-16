@@ -32,7 +32,11 @@ class Ga4ghRegistrationService {
         //  DATASET
         // Only add the dataset if it doesn't already exist
         String datasetName = yamlObj.datasetName
+        if (grailsApplication.config.uppercase.names) {
+            datasetName = datasetName.toUpperCase()
+        }
         logger.info("datasetName=" + datasetName)
+
         Dataset dataset = null
         Dataset.withTransaction  {
             dataset = Dataset.findByName(datasetName)
@@ -65,6 +69,11 @@ class Ga4ghRegistrationService {
             for (Map.Entry entry : mapSampleNameToFiles.entrySet()) {
                 String sampleName = entry.key
                 List filePaths = entry.value
+
+                // uppercase sample names based on configuration
+                if (grailsApplication.config.uppercase.names) {
+                    sampleName = sampleName.toUpperCase()
+                }
 
                 List bgzippedFiles = []
                 for (String filePath : filePaths) {
@@ -99,6 +108,10 @@ class Ga4ghRegistrationService {
                 for (Map.Entry entry : mapSampleNameToBams.entrySet()) {
                     String sampleName = entry.key
                     String bamPath = entry.value
+
+                    if (grailsApplication.config.uppercase.names) {
+                        sampleName = sampleName.toUpperCase()
+                    }
 
                     // Check that the readgroupset doesn't already exist with the same name
                     ReadGroupSet readGroupSet = null

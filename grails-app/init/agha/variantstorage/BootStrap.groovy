@@ -22,7 +22,7 @@ class BootStrap {
         //initCamel()
         //testVariantSet()
 
-        //cpiRegistrationService.registerVcfsBams()
+        cpiRegistrationService.registerVcfsBams()
     }
 
     def initAdmin() {

@@ -21,10 +21,12 @@ class VariantSetController {
         // Parse out the list of filenames associated with this VariantSet
         List<String> filePaths = vs.parseFilePaths()
         List<File> files = []
+        Long totalSize = 0
         if (filePaths) {
             for (String filePath : filePaths) {
                 File file = new File(filePath)
                 files << file
+                totalSize += file.length()
             }
         }
 
@@ -39,6 +41,7 @@ class VariantSetController {
                 variantSetJson.put('id', vs.id)
                 variantSetJson.put('name', vs.name)
                 variantSetJson.put('datasetId', vs.datasetId)
+                variantSetJson.put('totalSize', totalSize)
                 json.put('variantSet', variantSetJson)
 
                 JSONArray filesJson = new JSONArray()
