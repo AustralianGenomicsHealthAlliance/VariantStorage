@@ -73,6 +73,9 @@ dependencies {
     // Postgres
     compile 'postgresql:postgresql:9.1-901.jdbc4'
     //runtime "org.postgresql:postgresql:9.4.1208.jre8"
+
+    // spring security rest
+    compile "org.grails.plugins:spring-security-rest:2.0.0.M2"
 }
 
 bootRun {

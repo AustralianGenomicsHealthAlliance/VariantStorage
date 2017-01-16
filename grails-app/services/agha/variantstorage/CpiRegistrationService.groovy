@@ -58,7 +58,13 @@ class CpiRegistrationService {
                     }
                 }
 
-                ga4ghRegistrationService.registerDataset(yamlObj, cpiSampleNameHandler)
+                // skip errors
+                try {
+                    ga4ghRegistrationService.registerDataset(yamlObj, cpiSampleNameHandler)
+                } catch (Exception ex) {
+                    logger.error(ex.getMessage())
+                    ex.printStackTrace()
+                }
             }
 
         }
