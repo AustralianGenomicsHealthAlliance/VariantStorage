@@ -23,11 +23,14 @@ class ReadGroupSetController {
         }
 
         List<File> files = []
+        Long totalSize = 0
         if(rgs) {
             File bamFile = new File(rgs.dataUrl)
             File indexFile = new File(rgs.indexFile)
 
             files = [bamFile, indexFile]
+            totalSize += bamFile.length()
+            totalSize += bamFile.length()
         }
 
         withFormat {
@@ -41,6 +44,7 @@ class ReadGroupSetController {
                     rgsJson.put('name', rgs.name)
                     rgsJson.put('id', rgs.id)
                     rgsJson.put('datasetId', rgs.datasetId)
+                    rgsJson.put('totalSize', totalSize)
                     json.put('readGroupSet', rgsJson)
 
                     JSONArray filesJson = new JSONArray()

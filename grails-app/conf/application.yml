@@ -84,6 +84,8 @@ endpoints:
 ---
 # Dataset names and variant set names to be uppercased?
 uppercase.names: true
+# Use the BAM file name as the ReadGroup name, otherwise, the sample name encoded in the BAM file will be used
+bam.filename.as.readgroupset.name: true
 
 environments:
   development:

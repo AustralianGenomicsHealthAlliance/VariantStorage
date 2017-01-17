@@ -120,7 +120,7 @@ class Ga4ghRegistrationService {
                     }
                     logger.info("readGroupSet=" + readGroupSet)
                     if (readGroupSet == null) {
-                        addReadGroupSet(datasetName, bamPath, yamlObj.assembly)
+                        addReadGroupSet(datasetName, sampleName, bamPath, yamlObj.assembly)
                     } else {
                         logger.warn("ReadGroupSet already exists: " + bamPath + ". No action taken.")
                     }
@@ -198,9 +198,9 @@ class Ga4ghRegistrationService {
      * @param bamPath
      * @param referencesetName
      */
-    public void addReadGroupSet(String datasetName, String bamPath, String referencesetName) {
+    public void addReadGroupSet(String datasetName, String name=null, String bamPath, String referencesetName) {
         bamPath = bamPath.replaceAll(" ","\\ ") // Escape spaces
-        String command = grailsApplication.config.ga4gh_repo.path + "/ga4gh_repo add-readgroupset "+getGa4ghRegistryPath()+" "+datasetName+" -R "+referencesetName+" "+bamPath
+        String command = grailsApplication.config.ga4gh_repo.path + "/ga4gh_repo add-readgroupset "+getGa4ghRegistryPath()+" "+datasetName+" -R "+referencesetName+" "+bamPath+" -n "+name
         logger.info("executing command: "+command)
         String response = CliExec.execCommand(command)
         logger.info("response: "+response)
@@ -268,8 +268,12 @@ class Ga4ghRegistrationService {
             List<SAMReadGroupRecord> readGroups = fileHeader.getReadGroups()
             if (readGroups) {
                 for (SAMReadGroupRecord readGroup: readGroups) {
-                    String sample = readGroup.getSample()
-                    //logger.info("sample: "+sample)
+                    // remove the .bam extension
+                    String sample = file.name.take(file.name.lastIndexOf('.'))
+                    if (! grailsApplication.config.bam.filename.as.readgroupset.name) {
+                        sample = readGroup.getSample()
+                    }
+
                     mapSampleNameToBams.put(sample, file.absolutePath)
                 }
             }
