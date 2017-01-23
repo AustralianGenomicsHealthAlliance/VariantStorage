@@ -23,53 +23,54 @@ class CpiRegistrationService {
         new File(fileRoot).eachDirRecurse() { dir ->
             if (dir.name.endsWith("_snvcalls")) {
                 String cohortName = dir.parentFile.name
-                String vcfFolder = dir.absolutePath
-                String assembly = "GRCh37"
-                String bamFolder = dir.parentFile.absolutePath + "/bam_links"
+                if (cohortName.toUpperCase().matches("(APOSLE|MONA|GERMAN|MGRB|CPIC).*")) {
+                    String vcfFolder = dir.absolutePath
+                    String assembly = "GRCh37"
+                    String bamFolder = dir.parentFile.absolutePath + "/bam_links"
 
-                String pipelineVersion = getPipelineVersion(dir)
+                    String pipelineVersion = getPipelineVersion(dir)
 
-                String datasetName = cohortName
-                if (pipelineVersion) {
-                    datasetName += '_' + pipelineVersion
-                }
+                    String datasetName = cohortName
+                    if (pipelineVersion) {
+                        datasetName += '_' + pipelineVersion
+                    }
 
-                // Uppercase datasetName
-                datasetName = datasetName.toUpperCase()
+                    // Uppercase datasetName
+                    datasetName = datasetName.toUpperCase()
 
-                logger.info("pipelineVersion="+pipelineVersion)
-                logger.info("datasetName="+datasetName)
-                logger.info("vcfFolder="+vcfFolder)
-                logger.info("bamFolder="+bamFolder)
-                logger.info("assembly="+assembly)
+                    logger.info("pipelineVersion=" + pipelineVersion)
+                    logger.info("datasetName=" + datasetName)
+                    logger.info("vcfFolder=" + vcfFolder)
+                    logger.info("bamFolder=" + bamFolder)
+                    logger.info("assembly=" + assembly)
 
-                YamlObject yamlObj = new YamlObject()
-                yamlObj.datasetName = datasetName
-                yamlObj.vcfFolder = vcfFolder
-                yamlObj.bamFolder = bamFolder
-                yamlObj.assembly = assembly
+                    YamlObject yamlObj = new YamlObject()
+                    yamlObj.datasetName = datasetName
+                    yamlObj.vcfFolder = vcfFolder
+                    yamlObj.bamFolder = bamFolder
+                    yamlObj.assembly = assembly
 
-                SampleNameHandler cpiSampleNameHandler = new SampleNameHandler() {
+                    SampleNameHandler cpiSampleNameHandler = new SampleNameHandler() {
 
-                    @Override
-                    List<String> getSampleNames(File file) {
-                        List sampleNames = []
+                        @Override
+                        List<String> getSampleNames(File file) {
+                            List sampleNames = []
 
-                        sampleNames << file.name.split(("\\."))[0]
-                        //logger.info("sampleNames: "+sampleNames)
-                        return sampleNames
+                            sampleNames << file.name.split(("\\."))[0]
+                            //logger.info("sampleNames: "+sampleNames)
+                            return sampleNames
+                        }
+                    }
+
+                    // skip errors
+                    try {
+                        ga4ghRegistrationService.registerDataset(yamlObj, cpiSampleNameHandler)
+                    } catch (Exception ex) {
+                        logger.error(ex.getMessage())
+                        ex.printStackTrace()
                     }
                 }
-
-                // skip errors
-                try {
-                    ga4ghRegistrationService.registerDataset(yamlObj, cpiSampleNameHandler)
-                } catch (Exception ex) {
-                    logger.error(ex.getMessage())
-                    ex.printStackTrace()
-                }
             }
-
         }
 
     }
