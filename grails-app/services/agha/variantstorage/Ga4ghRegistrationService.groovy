@@ -12,6 +12,11 @@ import htsjdk.variant.vcf.VCFHeader
 import org.apache.camel.Exchange
 import org.apache.log4j.Logger
 
+/**
+ * Service for registering data files (VCFs, BAMs) with the GA4GH server
+ *
+ * @author Philip Wu
+ */
 class Ga4ghRegistrationService {
 
     static transactional = false
@@ -57,7 +62,7 @@ class Ga4ghRegistrationService {
         // Group VCFs by sample name
         if (yamlObj.vcfFolder) {
             logger.info("Processing vcfFolder: "+yamlObj.vcfFolder)
-            Map<String, List> mapSampleNameToFiles = mapSampleNameToFiles(yamlObj.vcfFolder, sampleNameHandler)
+            Map<String, List> mapSampleNameToFiles = mapSampleNameToFilesInFolder(yamlObj.vcfFolder, sampleNameHandler)
 
             // Bgzip the entire folder
             bgzipFolder(yamlObj.vcfFolder)
@@ -149,14 +154,32 @@ class Ga4ghRegistrationService {
      * @param strVcfFolder
      * @return
      */
-    public Map<String,List> mapSampleNameToFiles(String strVcfFolder, SampleNameHandler sampleNameHandler = new DefaultSampleNameHandler()) {
-
-        Map<String, List> mapSampleNameToVcfs = [:]
+    public Map<String,List> mapSampleNameToFilesInFolder(String strVcfFolder, SampleNameHandler sampleNameHandler = new DefaultSampleNameHandler()) {
 
         File vcfFolder = new File(strVcfFolder)
 
+        List files = []
         // Find all the VCFs in the folder
         vcfFolder.eachFileMatch(FileType.ANY, ~/.*\.vcf|.*\.gz/) { file ->
+            files << file
+        }
+
+        return mapSampleNameToFiles(files, sampleNameHandler)
+    }
+
+    /**
+     * Give the list of VCF files, map each sample name to a VCF file
+     * @param files
+     * @param sampleNameHandler
+     * @return
+     */
+    public Map<String,List> mapSampleNameToFiles(Collection<File> files, SampleNameHandler sampleNameHandler = new DefaultSampleNameHandler()) {
+
+        Map<String, List> mapSampleNameToVcfs = [:]
+
+
+        // Find all the VCFs in the folder
+        files.each { file ->
             logger.info("File: "+file.name)
 
             List<String> sampleNames = sampleNameHandler.getSampleNames(file)
@@ -173,6 +196,7 @@ class Ga4ghRegistrationService {
 
         return mapSampleNameToVcfs
     }
+
 
     /**
      * Add a variantset to the GA4GH server

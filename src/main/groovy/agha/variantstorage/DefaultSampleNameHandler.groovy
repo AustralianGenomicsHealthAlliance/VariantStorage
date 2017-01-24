@@ -4,6 +4,7 @@ import htsjdk.variant.vcf.VCFFileReader
 import htsjdk.variant.vcf.VCFHeader
 
 /**
+ * Retrieve the sample name based on the header attributes in the VCF file
  * Created by philip on 22/12/16.
  */
 class DefaultSampleNameHandler implements SampleNameHandler {

@@ -33,7 +33,11 @@
                 </tr>
                 <g:each in="${files}" var="file" >
                     <tr>
-                        <td>${file.name?.encodeAsHTML()}</td>
+                        <td>
+                            <g:link uri="/download/vcf/${variantSet.id}/${file.name?.encodeAsHTML()}">
+                                ${file.name?.encodeAsHTML()}
+                            </g:link>
+                        </td>
                         <td>
                             <g:if test="file?.length()">
                                 ${ Math.round(file.length() / 1024)} bytes

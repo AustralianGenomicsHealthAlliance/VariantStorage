@@ -7,10 +7,12 @@ import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
 @Secured(value=["IS_AUTHENTICATED_FULLY"])
-//@Secured(value=["ROLE_ANONYMOUS"])
+//@Secured(value=["ROLE_ANONYMOUS", "IS_AUTHENTICATED_FULLY", "IS_AUTHENTICATED_ANONYMOUSLY"])
 class DownloadController {
 
     Logger logger = Logger.getLogger(DownloadController.class)
+
+    Ga4ghRegistrationService ga4ghRegistrationService
 
     def index() { }
 
@@ -65,11 +67,52 @@ class DownloadController {
         }
     }
 
+    def vcf() {
+
+        // Parse the id to remove the trailing .vcf.gz
+        String filename = params.filename
+        String variantSetId = params.variantSetId
+
+        logger.info('filename='+filename)
+        logger.info('variantSetId='+variantSetId)
+
+        VariantSet vs = null
+        VariantSet.withTransaction {
+            vs = VariantSet.findById(params.variantSetId)
+        }
+
+        if (vs) {
+            // Find the matching file based on the name
+            List<String> filePaths = vs.parseFilePaths()
+            File file = null
+            filePaths.each { aFilePath ->
+                File aFile = new File(aFilePath)
+                if (aFile.name.equals(filename)) {
+                    file = aFile
+                }
+            }
+
+            logger.info("file="+file)
+            // File found?
+            if (file) {
+                response.setHeader("Content-Disposition", "Attachment;filename=" + filename)
+                response.setHeader("Accept-Ranges", "bytes");
+                if (filename.endsWith(".gz")) {
+                    response.setHeader("Content-Encoding", "gzip");
+                }
+
+                DownloadHelper.download(params, request, response, file)
+            }
+        }
+    }
+
+
     def bam() {
 
         // Parse the id to remove the trailing .bam extension
-        String rgsId = params.id.replaceFirst('.bam', '')
+        String rgsId = params.readGroupSetId
         logger.info("rgsId="+rgsId)
+        logger.info("filename="+params.filename)
 
         ReadGroupSet rgs = null
         ReadGroupSet.withTransaction {
@@ -77,34 +120,17 @@ class DownloadController {
         }
 
         if (rgs) {
-            File bam = new File(rgs.dataUrl)
-            String filename = params.id
-            response.setHeader("Content-Disposition", "Attachment;filename=" + filename)
-            response.setHeader("ETag", filename);
+            File file = null
+            if (params.filename.endsWith('.bam')) {
+                file = new File(rgs.dataUrl)
+            } else if (params.filename.endsWith('.bai')) {
+                file = new File(rgs.indexFile)
+            }
+
+            response.setHeader("Content-Disposition", "Attachment;filename=" + file.name)
             response.setHeader("Accept-Ranges", "bytes");
-            DownloadHelper.download(params, request, response, bam)
-        }
-
-    }
-
-    def bai() {
-
-        // Parse the id to remove the trailing .bam extension
-        String rgsId = params.id.replaceFirst('.bai', '')
-        logger.info("rgsId="+rgsId)
-
-        ReadGroupSet rgs = null
-        ReadGroupSet.withTransaction {
-            rgs = ReadGroupSet.findById(rgsId)
-        }
-
-        if (rgs) {
-            File bai = new File(rgs.indexFile)
-            String filename = params.id
-            response.setHeader("Content-Disposition", "Attachment;Filename=" + filename)
-            response.setHeader("ETag", filename);
-            response.setHeader("Accept-Ranges", "bytes");
-            DownloadHelper.download(params, request, response, bai)
+            response.setHeader("Content-Encoding", "gzip");
+            DownloadHelper.download(params, request, response, file)
         }
 
     }
