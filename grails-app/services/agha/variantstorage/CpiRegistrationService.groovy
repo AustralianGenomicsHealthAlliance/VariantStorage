@@ -1,6 +1,5 @@
 package agha.variantstorage
 
-import grails.transaction.Transactional
 import org.apache.log4j.Logger
 
 /**
@@ -13,7 +12,7 @@ class CpiRegistrationService {
 
     Logger logger = Logger.getLogger(CpiRegistrationService.class)
 
-    Ga4ghRegistrationService ga4ghRegistrationService
+    Ga4ghService ga4ghService
     def grailsApplication
 
     public void registerVcfsBams() {
@@ -64,7 +63,7 @@ class CpiRegistrationService {
 
                     // skip errors
                     try {
-                        ga4ghRegistrationService.registerDataset(yamlObj, cpiSampleNameHandler)
+                        ga4ghService.registerDataset(yamlObj, cpiSampleNameHandler)
                     } catch (Exception ex) {
                         logger.error(ex.getMessage())
                         ex.printStackTrace()

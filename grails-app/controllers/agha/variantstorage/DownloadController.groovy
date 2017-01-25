@@ -12,7 +12,7 @@ class DownloadController {
 
     Logger logger = Logger.getLogger(DownloadController.class)
 
-    Ga4ghRegistrationService ga4ghRegistrationService
+    Ga4ghService ga4ghService
 
     def index() { }
 
@@ -68,8 +68,6 @@ class DownloadController {
     }
 
     def vcf() {
-
-        // Parse the id to remove the trailing .vcf.gz
         String filename = params.filename
         String variantSetId = params.variantSetId
 
@@ -96,10 +94,10 @@ class DownloadController {
             // File found?
             if (file) {
                 response.setHeader("Content-Disposition", "Attachment;filename=" + filename)
-                response.setHeader("Accept-Ranges", "bytes");
-                if (filename.endsWith(".gz")) {
-                    response.setHeader("Content-Encoding", "gzip");
-                }
+                //response.setHeader("Accept-Ranges", "bytes");
+//                if (filename.endsWith(".gz")) {
+//                    response.setHeader("Content-Encoding", "gzip");
+//                }
 
                 DownloadHelper.download(params, request, response, file)
             }
@@ -128,8 +126,8 @@ class DownloadController {
             }
 
             response.setHeader("Content-Disposition", "Attachment;filename=" + file.name)
-            response.setHeader("Accept-Ranges", "bytes");
-            response.setHeader("Content-Encoding", "gzip");
+            //response.setHeader("Accept-Ranges", "bytes");
+            //response.setHeader("Content-Encoding", "gzip");
             DownloadHelper.download(params, request, response, file)
         }
 

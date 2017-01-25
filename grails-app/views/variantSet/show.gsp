@@ -1,6 +1,6 @@
+<!doctype html>
 <%@ page import="agha.variantstorage.*" %>
 
-<!doctype html>
 <html>
 <head>
     <meta name="layout" content="main"/>
@@ -21,6 +21,8 @@
             <g:link controller="download" action="variantSet" params="[id: variantSet.id]">
                 Download all files
             </g:link>
+
+
         </div>
 
         <fieldset>
@@ -30,11 +32,14 @@
                 <tr>
                     <th>Filename</th>
                     <th>Size</th>
+                    <th>IGV</th>
                 </tr>
                 <g:each in="${files}" var="file" >
+                    <g:set var="vcfUrl" value="${createLink(uri:'/download/vcf/'+variantSet.id+'/'+file.name?.encodeAsHTML())}" />
+
                     <tr>
                         <td>
-                            <g:link uri="/download/vcf/${variantSet.id}/${file.name?.encodeAsHTML()}">
+                            <g:link uri="${vcfUrl}">
                                 ${file.name?.encodeAsHTML()}
                             </g:link>
                         </td>
@@ -42,6 +47,11 @@
                             <g:if test="file?.length()">
                                 ${ Math.round(file.length() / 1024)} bytes
                             </g:if>
+                        </td>
+                        <td>
+                            <g:link controller="igv" params="[vcf: vcfUrl]">
+                                View in IGV
+                            </g:link>
                         </td>
                     </tr>
                 </g:each>

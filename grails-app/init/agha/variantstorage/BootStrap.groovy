@@ -9,7 +9,7 @@ import org.apache.camel.model.dataformat.YAMLLibrary
 
 class BootStrap {
 
-    Ga4ghRegistrationService ga4ghRegistrationService
+    Ga4ghService ga4ghService
     CamelContext camelCtx
     CpiRegistrationService cpiRegistrationService
     def grailsApplication
@@ -76,7 +76,7 @@ class BootStrap {
                                     System.out.println("registerDataset: "+filename)
                                     def yamlObj = exchange.getIn().body
 
-                                    ga4ghRegistrationService.registerDataset(yamlObj)
+                                    ga4ghService.registerDataset(yamlObj)
                                 }
 
                             })

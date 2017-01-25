@@ -1,15 +1,11 @@
 package agha.variantstorage
 
 import agha.cli.CliExec
-import grails.transaction.Transactional
 import groovy.io.FileType
 import htsjdk.samtools.SAMFileHeader
 import htsjdk.samtools.SAMReadGroupRecord
 import htsjdk.samtools.SamReader
 import htsjdk.samtools.SamReaderFactory
-import htsjdk.variant.vcf.VCFFileReader
-import htsjdk.variant.vcf.VCFHeader
-import org.apache.camel.Exchange
 import org.apache.log4j.Logger
 
 /**
@@ -17,11 +13,11 @@ import org.apache.log4j.Logger
  *
  * @author Philip Wu
  */
-class Ga4ghRegistrationService {
+class Ga4ghService {
 
     static transactional = false
 
-    Logger logger = Logger.getLogger(Ga4ghRegistrationService.class)
+    Logger logger = Logger.getLogger(Ga4ghService.class)
 
     def grailsApplication
     def sessionFactory
@@ -311,5 +307,6 @@ class Ga4ghRegistrationService {
         logger.info("registryPath: "+registryPath)
         return registryPath
     }
+
 
 }

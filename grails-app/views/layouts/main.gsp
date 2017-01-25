@@ -8,7 +8,16 @@
     </title>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
+    <asset:javascript src="jquery-2.2.0.min.js"/>
+    <asset:javascript src="jquery-ui.min.js"/>
+
+    <asset:stylesheet src="jquery-ui.min.css" />
+    <asset:stylesheet src="jquery-ui.theme.min.css" />
     <asset:stylesheet src="application.css"/>
+
+    <asset:javascript src="igv-1.0.6.js" />
+    <asset:stylesheet src="igv-1.0.6.css"/>
+
 
     <g:layoutHead/>
 </head>
@@ -45,7 +54,7 @@
         <g:message code="spinner.alt" default="Loading&hellip;"/>
     </div>
 
-    <asset:javascript src="application.js"/>
+
 
 </body>
 </html>

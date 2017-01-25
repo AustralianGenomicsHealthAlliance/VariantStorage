@@ -18,6 +18,23 @@ class VariantSetController {
             vs = VariantSet.findById(params.id)
         }
 
+        // Find the associated BAM
+        logger.info("datasetId: "+vs.datasetId+' sampleName: '+vs.name)
+        List<ReadGroupSet> readGroupSets = ReadGroupSet.findReadGroupSetByDatasetIdAndSampleName(vs.datasetId, vs.name.toUpperCase())
+        ReadGroupSet.withTransaction {
+            List<ReadGroupSet> rgs = ReadGroupSet.findAllByDatasetId(vs.datasetId)
+            logger.info('rgs='+rgs)
+            logger.info('rgs readGroups = '+rgs.readGroups)
+            rgs.readGroups.each { rg ->
+                logger.info('sampleName:'+rg.sampleName)
+            }
+        }
+        logger.info('readGroupSets='+readGroupSets)
+        ReadGroupSet readGroupSet = null
+        if (readGroupSets) {
+            readGroupSet = readGroupSets.get(0) // Assume the first one
+        }
+
         // Parse out the list of filenames associated with this VariantSet
         List<String> filePaths = vs.parseFilePaths()
         List<File> files = []
@@ -31,7 +48,7 @@ class VariantSetController {
         }
 
         withFormat {
-            html { respond vs, model: [files: files] }
+            html { respond vs, model: [files: files, readGroupSet: readGroupSet] }
             json {
                 logger.info("Creating json response")
                 // Collect fields of interest into a Map for a JSON response
