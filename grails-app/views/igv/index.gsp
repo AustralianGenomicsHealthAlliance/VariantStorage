@@ -24,7 +24,7 @@
                 fastaURL: "https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/1kg_v37/human_g1k_v37_decoy.fasta",
                 cytobandURL: "https://s3.amazonaws.com/igv.broadinstitute.org/genomes/seq/b37/b37_cytoband.txt"
             },
-            locus: "myc",
+            locus: "${locus}",
             tracks: [
                 {
                     name: "Genes",
@@ -36,14 +36,6 @@
                     order: Number.MAX_VALUE,
                     visibilityWindow: 300000000,
                     displayMode: "EXPANDED"
-                },
-
-                {
-                    name: "Phase 3 WGS variants",
-                    format: "vcf",
-                    url: "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz",
-                    indexURL:  "https://s3.amazonaws.com/1000genomes/release/20130502/ALL.wgs.phase3_shapeit2_mvncall_integrated_v5b.20130502.sites.vcf.gz.tbi",
-                    type: "variant"
                 },
 
                 <g:each in="${ vcfUrls}" var="vcfUrl">

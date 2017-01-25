@@ -36,7 +36,6 @@
                 </tr>
                 <g:each in="${files}" var="file" >
                     <g:set var="vcfUrl" value="${createLink(uri:'/download/vcf/'+variantSet.id+'/'+file.name?.encodeAsHTML())}" />
-
                     <tr>
                         <td>
                             <g:link uri="${vcfUrl}">
@@ -49,9 +48,19 @@
                             </g:if>
                         </td>
                         <td>
-                            <g:link controller="igv" params="[vcf: vcfUrl]">
-                                View in IGV
-                            </g:link>
+                            <g:if test="${file.name?.endsWith('.vcf.gz')}">
+                                <g:if test="${readGroupSet}">
+                                    <g:set var="bamUrl" value="${createLink(uri:'download/bam/'+readGroupSet.id+'/'+readGroupSet.name?.encodeAsHTML())}" />
+                                    <g:link controller="igv" params="[vcf: vcfUrl, bam: bamUrl]">
+                                        View in IGV
+                                    </g:link>
+                                </g:if>
+                                <g:else>
+                                    <g:link controller="igv" params="[vcf: vcfUrl]">
+                                        View in IGV
+                                    </g:link>
+                                </g:else>
+                            </g:if>
                         </td>
                     </tr>
                 </g:each>

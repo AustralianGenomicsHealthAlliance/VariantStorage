@@ -15,10 +15,11 @@ class IgvController {
     def index() {
         List vcfUrls = params.list('vcf')
         List bamUrls = params.list('bam')
+        String locus = params.locus
 
         logger.info('vcfUrls='+vcfUrls)
 
 
-        [vcfUrls: vcfUrls, bamUrls: bamUrls]
+        [vcfUrls: vcfUrls, bamUrls: bamUrls, locus:locus]
     }
 }
