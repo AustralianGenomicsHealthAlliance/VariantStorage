@@ -12,6 +12,8 @@ class VariantSetController {
 
     Logger logger = Logger.getLogger(VariantSetController.class)
 
+    Ga4ghService ga4ghService
+
     def show() {
         VariantSet vs = null
         VariantSet.withTransaction {
@@ -20,23 +22,24 @@ class VariantSetController {
 
         // Find the associated BAM
         logger.info("datasetId: "+vs.datasetId+' sampleName: '+vs.name)
-        List<ReadGroupSet> readGroupSets = ReadGroupSet.findReadGroupSetByDatasetIdAndSampleName(vs.datasetId, vs.name.toUpperCase())
+
         ReadGroupSet.withTransaction {
             List<ReadGroupSet> rgs = ReadGroupSet.findAllByDatasetId(vs.datasetId)
             logger.info('rgs='+rgs)
+            for (ReadGroupSet readGrpSet: rgs) {
+                logger.info('readGrpSet name: '+readGrpSet.name)
+            }
             logger.info('rgs readGroups = '+rgs.readGroups)
             rgs.readGroups.each { rg ->
                 logger.info('sampleName:'+rg.sampleName)
             }
         }
-        logger.info('readGroupSets='+readGroupSets)
-        ReadGroupSet readGroupSet = null
-        if (readGroupSets) {
-            readGroupSet = readGroupSets.get(0) // Assume the first one
-        }
+        ReadGroupSet readGroupSet = ga4ghService.findReadGroupSetByDatasetIdAndName(vs.datasetId, vs.name.toUpperCase())
+        logger.info('readGroupSet='+readGroupSet)
 
         // Parse out the list of filenames associated with this VariantSet
         List<String> filePaths = vs.parseFilePaths()
+        Map<String,String> chrMap = [:]
         List<File> files = []
         Long totalSize = 0
         if (filePaths) {
@@ -44,11 +47,21 @@ class VariantSetController {
                 File file = new File(filePath)
                 files << file
                 totalSize += file.length()
+
+                //Map each filename to a chromosome using the vcf file
+                logger.info('file.name='+file.name)
+                if (file.name.endsWith('.vcf.gz')) {
+                    String firstChr = ga4ghService.getFirstChr(file)
+                    chrMap[file.name] = firstChr
+                    logger.info('firstChr=' + firstChr)
+                }
             }
         }
 
+        logger.info('chrMap: '+chrMap)
+
         withFormat {
-            html { respond vs, model: [files: files, readGroupSet: readGroupSet] }
+            html { respond vs, model: [files: files, readGroupSet: readGroupSet, chrMap: chrMap]  }
             json {
                 logger.info("Creating json response")
                 // Collect fields of interest into a Map for a JSON response

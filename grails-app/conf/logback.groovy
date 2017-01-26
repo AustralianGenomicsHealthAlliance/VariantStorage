@@ -34,7 +34,6 @@ if (Environment.isDevelopmentMode() && targetDir != null) {
     }
     logger("StackTrace", ERROR, ['FULL_STACKTRACE'], false)
     logger('agha', INFO, ['STDOUT'])
-    logger('agha', INFO, ['STDOUT'])
     root(ERROR, ['FULL_STACKTRACE'])
 }
 else {

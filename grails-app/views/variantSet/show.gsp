@@ -50,13 +50,13 @@
                         <td>
                             <g:if test="${file.name?.endsWith('.vcf.gz')}">
                                 <g:if test="${readGroupSet}">
-                                    <g:set var="bamUrl" value="${createLink(uri:'download/bam/'+readGroupSet.id+'/'+readGroupSet.name?.encodeAsHTML())}" />
-                                    <g:link controller="igv" params="[vcf: vcfUrl, bam: bamUrl]">
+                                    <g:set var="bamUrl" value="${createLink(uri:'/download/bam/'+readGroupSet.id+'/'+readGroupSet.name?.encodeAsHTML()+'.bam')}" />
+                                    <g:link controller="igv" params="[vcf: vcfUrl, bam: bamUrl, locus: chrMap[file.name] ]">
                                         View in IGV
                                     </g:link>
                                 </g:if>
                                 <g:else>
-                                    <g:link controller="igv" params="[vcf: vcfUrl]">
+                                    <g:link controller="igv" params="[vcf: vcfUrl, locus: chrMap[file.name]]">
                                         View in IGV
                                     </g:link>
                                 </g:else>

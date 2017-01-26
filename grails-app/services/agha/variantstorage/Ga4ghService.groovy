@@ -6,7 +6,13 @@ import htsjdk.samtools.SAMFileHeader
 import htsjdk.samtools.SAMReadGroupRecord
 import htsjdk.samtools.SamReader
 import htsjdk.samtools.SamReaderFactory
+import htsjdk.samtools.util.CloseableIterator
+import htsjdk.tribble.readers.TabixReader
+import htsjdk.variant.variantcontext.VariantContext
+import htsjdk.variant.vcf.VCFFileReader
 import org.apache.log4j.Logger
+
+import java.util.zip.GZIPInputStream
 
 /**
  * Service for registering data files (VCFs, BAMs) with the GA4GH server
@@ -308,5 +314,51 @@ class Ga4ghService {
         return registryPath
     }
 
+    /**
+     * Find the ReadGroupSet based on the datasetId and the name using a stepwise search based on the sample name
+     * embedded in the BAM file, or the assigned name of the ReadGroupSet in that order.
+     * @param datasetId
+     * @param name
+     * @return
+     */
+    public ReadGroupSet findReadGroupSetByDatasetIdAndName(String datasetId, String name) {
+        logger.info("name: *****"+name+'*****')
+        ReadGroupSet.withTransaction {
+            // First attempt to find it by relying on the ReadGroup.sampleName.
+            // This may not always be accurately populated.
+            List<ReadGroupSet> readGroupSets = ReadGroupSet.findReadGroupSetByDatasetIdAndSampleName(datasetId, name)
+            logger.info("readGroupSets="+readGroupSets)
+            if (readGroupSets) {
+                return readGroupSets[0]
+            } else {
+                logger.info("Searching by ReadGroupSet.name")
+                // Second attempt, match on the assumption that the sample name is the same as the ReadGroupSet.name
+                ReadGroupSet readGroupSet = ReadGroupSet.findByDatasetIdAndName(datasetId, name)
+                logger.info('readGroupSet='+readGroupSet)
+                return readGroupSet
+            }
+        }
+    }
+
+    /**
+     * Retrieve the first chromosome listed in the VCF file
+     * @param vcfFile
+     * @return
+     */
+    public String getFirstChr(File vcfFile) {
+        logger.info('vcfFile: '+vcfFile)
+
+        String chr = null
+
+//        if (tbiFile.absolutePath.endsWith('.tbi')) {
+            TabixReader tbxReader = new TabixReader(vcfFile.absolutePath)
+            Set<String> chrs = tbxReader.getChromosomes()
+            if (chrs) {
+                chr = chrs.iterator().next()
+            }
+//        }
+        return chr
+
+    }
 
 }
