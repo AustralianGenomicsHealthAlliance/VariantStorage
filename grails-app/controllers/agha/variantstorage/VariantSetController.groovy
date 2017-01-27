@@ -72,6 +72,7 @@ class VariantSetController {
                 variantSetJson.put('name', vs.name)
                 variantSetJson.put('datasetId', vs.datasetId)
                 variantSetJson.put('totalSize', totalSize)
+                variantSetJson.put('chrFileMap', vs.dataUrlIndexMap)
                 json.put('variantSet', variantSetJson)
 
                 JSONArray filesJson = new JSONArray()

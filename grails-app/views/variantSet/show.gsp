@@ -38,9 +38,9 @@
                     <g:set var="vcfUrl" value="${createLink(uri:'/download/vcf/'+variantSet.id+'/'+file.name?.encodeAsHTML())}" />
                     <tr>
                         <td>
-                            <g:link uri="${vcfUrl}">
+                            <a href="${vcfUrl}">
                                 ${file.name?.encodeAsHTML()}
-                            </g:link>
+                            </a>
                         </td>
                         <td>
                             <g:if test="file?.length()">

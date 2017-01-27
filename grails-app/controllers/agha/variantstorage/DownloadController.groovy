@@ -100,6 +100,8 @@ class DownloadController {
 //                }
 
                 DownloadHelper.download(params, request, response, file)
+            } else {
+                render ('file not found')
             }
         }
     }

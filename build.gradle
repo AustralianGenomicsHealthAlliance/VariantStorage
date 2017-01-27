@@ -5,7 +5,7 @@ buildscript {
     }
     dependencies {
         classpath "org.grails:grails-gradle-plugin:$grailsVersion"
-        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.11.6"
+        classpath "com.bertramlabs.plugins:asset-pipeline-gradle:2.12.4"
         classpath "org.grails.plugins:hibernate5:6.0.4"
     }
 }
@@ -83,8 +83,13 @@ bootRun {
 }
 
 assets {
-    minifyJs = true
+    minifyJs = false
     minifyCss = true
+    enableSourceMaps = true
+    minifyOptions = [
+            languageMode: 'ES6',
+            targetLanguage: 'ES6'
+    ]
 }
 
 war {
