@@ -22,7 +22,7 @@ class CpiRegistrationService {
         new File(fileRoot).eachDirRecurse() { dir ->
             if (dir.name.endsWith("_snvcalls")) {
                 String cohortName = dir.parentFile.name
-                if (cohortName.toUpperCase().matches("(APOSLE|MONA|GERMAN|MGRB|CPIC).*")) {
+                if (cohortName.toUpperCase().matches("(APOSLE|MONA|GERMAN|CPIC).*")) {
                     String vcfFolder = dir.absolutePath
                     String assembly = "GRCh37"
                     String bamFolder = dir.parentFile.absolutePath + "/bam_links"

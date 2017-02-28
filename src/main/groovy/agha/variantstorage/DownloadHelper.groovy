@@ -37,11 +37,13 @@ class DownloadHelper {
 
         ServletOutputStream oStream = response.outputStream
 
+        InputStream is = file.newInputStream()
+
         if (!ranges) {
             //Full content response
             response.contentType = CONTENT_TYPE
             response.setHeader "Content-Length", file.length().toString()
-            oStream << file.newInputStream()
+            oStream << is
         }
         else {
             // Partial content response.
@@ -70,7 +72,7 @@ class DownloadHelper {
                 }
 
                 if (oStream) {
-                    copy(file.newInputStream(), oStream, range)
+                    copy(is, oStream, range)
                 }
             }
             else {
@@ -83,7 +85,7 @@ class DownloadHelper {
                     logger.warn("Can't set HttpServletResponse buffer size.",e)
                 }
                 if (oStream) {
-                    copy(file.newInputStream(), oStream, ranges.iterator(), CONTENT_TYPE)
+                    copy(is, oStream, ranges.iterator(), CONTENT_TYPE)
                 }
                 else {
                     // we should not get here
@@ -91,6 +93,8 @@ class DownloadHelper {
                 }
             }
         }
+
+        is.close()
 
 
     }

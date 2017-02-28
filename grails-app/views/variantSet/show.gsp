@@ -21,8 +21,6 @@
             <g:link controller="download" action="variantSet" params="[id: variantSet.id]">
                 Download all files
             </g:link>
-
-
         </div>
 
         <fieldset>
