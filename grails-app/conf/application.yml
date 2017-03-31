@@ -93,6 +93,8 @@ environments:
 #    ga4gh_repo.registry: "/home/philip/ga4gh-server-env/registry.db"
     camel.import: "file:/home/philip/ga4gh_registration?move=archived"
     existing.files.root: "/home/philip/ga4gh-server-env/cpi_datasets"
+    hla.root: "/home/philip/hla"
+    samtools.path: "samtools"
   test:
     grails.serverURL: "https://130.56.244.154/ga4gh_frontend"
     ga4gh_repo.path: "/mnt/ga4gh/ga4gh-server-env/bin"
