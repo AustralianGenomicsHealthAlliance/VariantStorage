@@ -1,6 +1,7 @@
 package agha.variantstorage
 
 import agha.cli.CliExec
+import grails.util.Environment
 import groovy.io.FileType
 import htsjdk.samtools.SAMFileHeader
 import htsjdk.samtools.SAMReadGroupRecord
@@ -66,10 +67,13 @@ class Ga4ghService {
             logger.info("Processing vcfFolder: "+yamlObj.vcfFolder)
             Map<String, List> mapSampleNameToFiles = mapSampleNameToFilesInFolder(yamlObj.vcfFolder, sampleNameHandler)
 
-            // Bgzip the entire folder
-            bgzipFolder(yamlObj.vcfFolder)
-            // Tabix the entire folder
-            tabixFolder(yamlObj.vcfFolder)
+            if (Environment.current == Environment.DEVELOPMENT) {
+                // Bgzip the entire folder
+                bgzipFolder(yamlObj.vcfFolder)
+                // Tabix the entire folder
+                tabixFolder(yamlObj.vcfFolder)
+            }
+
 
             logger.info("vcfFolder: " + yamlObj.vcfFolder)
             logger.info("referencesetName: " + yamlObj.assembly)
