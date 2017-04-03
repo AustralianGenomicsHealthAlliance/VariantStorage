@@ -101,11 +101,18 @@ environments:
 #    ga4gh_repo.registry: "/mnt/ga4gh/registry.db"
     camel.import: "file:/mnt/u86_nfs/camel?move=archived"
     existing.files.root: "/mnt/u86_nfs/variantdb/runs/v2.3"
+    hla.root: "/mnt/hla-genotyper"
+    samtools.path: "/bin/samtools"
   production:
     ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
 #    ga4gh_repo.registry: "/home/philip/ga4gh-server-env/registry.db"
     camel.import: "file:/home/philip/ga4gh_registration?move=archived"
     existing.files.root: "/home/philip/ga4gh-server-env/cpi_datasets"
+
+
+# grails mail plugin setting
+grails.mail.host: "smtphost.anu.edu.au"
+grails.mail.default.from: "APF Informatics <it.apf@anu.edu.au>"
 
 ---
 hibernate:

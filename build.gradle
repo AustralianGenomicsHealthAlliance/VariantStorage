@@ -76,6 +76,9 @@ dependencies {
 
     // spring security rest
     compile "org.grails.plugins:spring-security-rest:2.0.0.M2"
+
+    // Email
+    compile 'org.grails.plugins:mail:2.0.0.RC6'
 }
 
 bootRun {

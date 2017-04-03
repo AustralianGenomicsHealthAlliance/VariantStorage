@@ -4,6 +4,12 @@ import agha.cli.CliExec
 import grails.transaction.Transactional
 import org.apache.log4j.Logger
 
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
+
+/**
+ * Service for running HLA predictions on BAM files
+ */
 @Transactional
 class HlaGenotyperService {
 
@@ -57,7 +63,14 @@ class HlaGenotyperService {
         return unmappedBam
     }
 
-    public File execute(File originalBam,  HlaEthnicity ethnicity, HlaCoverage coverage ) {
+    /**
+     * Returns the folder containing the results
+     * @param originalBam
+     * @param ethnicity
+     * @param coverage
+     * @return
+     */
+    public File execute(File originalBam,  HlaEthnicity ethnicity, HlaCoverage coverage) {
 
         String hlaDir = grailsApplication.config.hla.root
 
@@ -90,5 +103,7 @@ class HlaGenotyperService {
 
         return outputDir
     }
+
+
 
 }
