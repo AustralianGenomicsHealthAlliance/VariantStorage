@@ -24,6 +24,7 @@ class HlaController {
         HlaGenotyperService.HlaEthnicity ethnicity= HlaGenotyperService.HlaEthnicity.valueOf(params.ethnicity)
 
         ReadGroupSet rgs = null
+        String errMsg = null
         ReadGroupSet.withTransaction {
             rgs = ReadGroupSet.findById(params.readGroupSetId)
         }
@@ -55,6 +56,8 @@ class HlaController {
                     logger.info('Results sent')
                 }
             }
+        } else {
+            errMsg = "Could not find ReadGroupSet with ID: " + params.readGroupSetId
         }
 
 
@@ -64,7 +67,11 @@ class HlaController {
             }
             json {
                 JSONObject json = new JSONObject()
-                json.put("submitted", Boolean.TRUE)
+                if (errMsg) {
+                    json.put("error", errMsg)
+                } else {
+                    json.put("submitted", Boolean.TRUE)
+                }
 
                 render json
             }
