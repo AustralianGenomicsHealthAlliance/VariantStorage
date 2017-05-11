@@ -10,8 +10,8 @@ import org.grails.web.json.JSONObject
  * Controller for ReadGroupSets (BAMs) in the GA4GH server
  * @author Philip Wu
  */
-//@Secured(value=["IS_AUTHENTICATED_FULLY"])
-@Secured(['IS_AUTHENTICATED_ANONYMOUSLY'])
+@Secured(value=["IS_AUTHENTICATED_FULLY"])
+//@Secured(['IS_AUTHENTICATED_ANONYMOUSLY'])
 class ReadGroupSetController {
 
     Logger logger = Logger.getLogger(VariantSetController.class)

@@ -13,6 +13,7 @@ class DownloadController {
     Logger logger = Logger.getLogger(DownloadController.class)
 
     Ga4ghService ga4ghService
+    SummaryReportsService summaryReportsService
 
     def index() { }
 
@@ -133,6 +134,23 @@ class DownloadController {
             DownloadHelper.download(params, request, response, file)
         }
 
+    }
+
+    def summary() {
+
+         String sampleName = params.sampleName //"APOSLE_cohort52_sg1_AFFECTED1"
+
+        List files = summaryReportsService.findFiles(params.pipelineVersion, params.cohortId, sampleName)
+
+        List filePaths = files.collect { it.absolutePath }
+
+        String filename = sampleName+".summary.zip"
+        response.setContentType('APPLICATION/OCTET-STREAM')
+        response.setHeader("Content-Disposition", "Attachment;filename=" + filename)
+
+        zipFiles(filePaths, response.outputStream)
+
+        response.outputStream.flush()
     }
 
     /**

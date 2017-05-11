@@ -100,7 +100,7 @@ environments:
     ga4gh_repo.path: "/mnt/ga4gh/ga4gh-server-env/bin"
 #    ga4gh_repo.registry: "/mnt/ga4gh/registry.db"
     camel.import: "file:/mnt/u86_nfs/camel?move=archived"
-    existing.files.root: "/mnt/u86_nfs/variantdb/runs/v2.3"
+    existing.files.root: "/mnt/u86_nfs/variantdb/runs"
     hla.root: "/mnt/hla-genotyper"
     samtools.path: "/bin/samtools"
   production:
