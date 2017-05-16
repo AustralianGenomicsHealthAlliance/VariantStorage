@@ -138,7 +138,7 @@ class DownloadController {
 
     def summary() {
 
-         String sampleName = params.sampleName //"APOSLE_cohort52_sg1_AFFECTED1"
+        String sampleName = params.sampleName //"APOSLE_cohort52_sg1_AFFECTED1"
 
         List files = summaryReportsService.findFiles(params.pipelineVersion, params.cohortId, sampleName)
 
@@ -147,10 +147,10 @@ class DownloadController {
         String filename = sampleName+".summary.zip"
         response.setContentType('APPLICATION/OCTET-STREAM')
         response.setHeader("Content-Disposition", "Attachment;filename=" + filename)
+        OutputStream os = response.outputStream
+        zipFiles(filePaths, os)
 
-        zipFiles(filePaths, response.outputStream)
-
-        response.outputStream.flush()
+        os.flush()
     }
 
     /**
