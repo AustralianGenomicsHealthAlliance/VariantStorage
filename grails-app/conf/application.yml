@@ -135,7 +135,7 @@ dataSources:
         driverClassName: "org.postgresql.Driver"
         pooled: true
         dbCreate: "update"
-        url: "jdbc:postgresql://localhost:5432/ga4gh_frontend"
+        url: "jdbc:postgresql://localhost:5432/variant_storage"
 
 
 environments:
@@ -147,7 +147,7 @@ environments:
             dataSource:
                 driverClassName: "org.postgresql.Driver"
                 dbCreate: "update"
-                url: "jdbc:postgresql://localhost:5432/ga4gh_frontend"
+                url: "jdbc:postgresql://localhost:5432/variant_storage"
                 username: "postgres"
                 password: "postgres"
     test:
