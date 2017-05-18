@@ -9,9 +9,9 @@ import org.apache.camel.model.dataformat.YAMLLibrary
 
 class BootStrap {
 
-    Ga4ghService ga4ghService
+    //Ga4ghService ga4ghService
     CamelContext camelCtx
-    CpiRegistrationService cpiRegistrationService
+    //CpiRegistrationService cpiRegistrationService
     def grailsApplication
 
     def init = { servletContext ->
@@ -20,9 +20,6 @@ class BootStrap {
         initSecurityRoles()
         initAdmin()
         //initCamel()
-        //testVariantSet()
-
-        //cpiRegistrationService.registerVcfsBams()
     }
 
     def initAdmin() {
@@ -91,13 +88,6 @@ class BootStrap {
 
     }
 
-    def testVariantSet() {
-        List variantSets = VariantSet.findAll()
-        System.out.println("num of variantSets: "+variantSets?.size())
-        for (VariantSet vs : variantSets) {
-            System.out.println("name: "+vs.name)
-        }
-    }
 
     def destroy = {
         camelCtx.stop()

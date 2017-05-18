@@ -5,15 +5,14 @@ import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 
 @Secured(value=["IS_AUTHENTICATED_FULLY"])
-class SummaryReportsController {
+class VcfController {
 
-    SummaryReportsService summaryReportsService
+    VcfService vcfService
 
+    def unfiltered() {
 
+        List files = vcfService.findUnfilteredVcfs(params.pipelineVersion, params.cohortId, params.sampleName)
 
-    def list() {
-
-        List files = summaryReportsService.findFiles(params.pipelineVersion, params.cohortId, params.sampleName)
 
         withFormat {
             html {
@@ -22,22 +21,24 @@ class SummaryReportsController {
             }
             json {
                 JSONObject json = new JSONObject()
+                long totalSize = 0
                 if (files) {
                     JSONArray filesJson = new JSONArray()
                     for (File file: files) {
-                        JSONArray jsonFile = new JSONArray()
-                        jsonFile.add(file.name)
-                        jsonFile.add(file.length())
+                        JSONObject jsonFile = new JSONObject()
+                        jsonFile.put('name': file.name)
+                        jsonFile.put('size': file.length())
                         //jsonFile.put('absolutePath', file.absolutePath)
                         filesJson.add(jsonFile)
+
+                        totalSize += file.length()
                     }
-                    json.put('data', filesJson)
+                    json.put('files', filesJson)
+                    json.put('totalSize': totalSize)
                 }
 
                 render json
             }
         }
     }
-
-
 }

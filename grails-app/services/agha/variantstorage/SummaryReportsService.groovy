@@ -15,6 +15,7 @@ class SummaryReportsService {
 
     Logger logger = Logger.getLogger(SummaryReportsService.class)
 
+    FileService fileService
     def grailsApplication
 
     /**
@@ -23,62 +24,27 @@ class SummaryReportsService {
      * @param sampleName
      * @return
      */
-    def List findFiles(String pipelineVersion,String cohortId = null, String sampleName) {
-        logger.info("pipelineVersion: "+pipelineVersion)
-        logger.info("cohortId: "+cohortId)
-        logger.info("sampleName: "+sampleName)
+    def List findFiles(String pipelineVersion,String cohortId, String sampleName) {
+        Closure filesClosure = { File sampleBioRunDir, List files ->
+            // Filter by summary folder
+            new File(sampleBioRunDir.absolutePath).eachDirMatch(~/summary/) { summaryDir ->
+                logger.info('summaryDir: ' + summaryDir.name)
 
-        String fileRoot = grailsApplication.config.existing.files.root
-        logger.info("fileRoot: "+fileRoot)
-
-        // Example folder structure:
-        // ../v2.3/human_related_gatk/APOSLE_cohort52/APOSLE_cohort52_sg1_affected1_runs/APOSLE_cohort52_sg1_affected1_180/summary
-
-        List files = []
-
-        try {
-            // Filter by pipeline
-            new File(fileRoot).eachDirMatch(~/(?i)${pipelineVersion}/) { pipelineDir ->
-                logger.info('pipelineDir: ' + pipelineDir.name)
-
-                // Filter by cohortId
-                new File(pipelineDir.absolutePath).traverse(maxDepth: 2, nameFilter: ~/(?i)${cohortId}/) { cohortDir ->
-                    logger.info('cohortDir: ' + cohortDir.name)
-
-                    // Filter by sample run
-                    new File(cohortDir.absolutePath).eachDirMatch(~/(?i)${sampleName}_runs/) { runDir ->
-                        logger.info('runDir: ' + runDir.name)
-
-                        // Filter by sample Bio run
-                        new File(runDir.absolutePath).eachDirMatch(~/(?i)${sampleName}_.*/) { sampleBioRunDir ->
-                            logger.info('sampleBioRunDir: ' + sampleBioRunDir.name)
-
-                            // Filter by summary folder
-                            new File(sampleBioRunDir.absolutePath).eachDirMatch(~/summary/) { summaryDir ->
-                                logger.info('summaryDir: ' + summaryDir.name)
-
-                                boolean found = false
-                                // Filter by sampleName
-                                new File(summaryDir.absolutePath).eachFileMatch(~/(?i)${sampleName}.*\.summary\.tsv$/) { tsv ->
-                                    logger.info('tsv: ' + tsv.name)
-                                    files.add(tsv)
-                                    found = true
-                                }
-
-                                if (found) {
-                                    throw new Exception("Breaking out of loop")
-                                }
-
-                            }
-                        }
-                    }
+                boolean found = false
+                // Filter by sampleName
+                new File(summaryDir.absolutePath).eachFileMatch(~/(?i)${sampleName}.*\.summary\.tsv$/) { tsv ->
+                    logger.info('tsv: ' + tsv.name)
+                    files.add(tsv)
+                    found = true
                 }
+
+                if (found) {
+                    throw new Exception("Breaking out of loop")
+                }
+
             }
-        } catch (Exception ex) {
+        } // end closure
 
-        }
-
-        logger.info("find files completed")
-        return files
+        return fileService.find(pipelineVersion, cohortId, sampleName, filesClosure)
     }
 }

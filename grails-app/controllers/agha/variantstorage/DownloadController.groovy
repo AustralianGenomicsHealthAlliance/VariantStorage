@@ -12,129 +12,53 @@ class DownloadController {
 
     Logger logger = Logger.getLogger(DownloadController.class)
 
-    Ga4ghService ga4ghService
     SummaryReportsService summaryReportsService
+    VcfService vcfService
+    BamService bamService
 
     def index() { }
 
-    /**
-     * Download all the files for a variant set
-     */
-    def variantSet() {
-        VariantSet vs = null
-        VariantSet.withTransaction {
-            vs = VariantSet.findById(params.id)
-        }
-
-        if (vs) {
-            String filename = vs.name + ".vcfs.zip"
-            logger.info("filename: " + filename)
-            response.setContentType('APPLICATION/OCTET-STREAM')
-            response.setHeader("Content-Disposition", "Attachment;Filename=" + filename)
-
-            // Parse out the list of filenames associated with this VariantSet
-            List<String> filePaths = vs.parseFilePaths()
-
-            // Compress the files into a single file for download
-            zipFiles(filePaths, response.outputStream)
-
-
-            response.outputStream.flush()
-        }
-    }
-
-    /**
-     * Download all the files for a readgroup set
-     */
-    def readGroupSet() {
-        ReadGroupSet rgs = null
-        ReadGroupSet.withTransaction {
-            rgs = ReadGroupSet.findById(params.id)
-        }
-
-        if (rgs) {
-            String filename = rgs.name + ".bam.zip"
-            logger.info("filename: " + filename)
-            response.setContentType('APPLICATION/OCTET-STREAM')
-            response.setHeader("Content-Disposition", "Attachment;filename=" + filename)
-
-            // Parse out the list of filenames associated with this VariantSet
-            List<String> filePaths = [rgs.dataUrl, rgs.indexFile]
-
-            zipFiles(filePaths, response.outputStream)
-
-
-            response.outputStream.flush()
-        }
-    }
 
     def vcf() {
-        String filename = params.filename
-        String variantSetId = params.variantSetId
 
-        logger.info('filename='+filename)
-        logger.info('variantSetId='+variantSetId)
+        List files = vcfService.findUnfilteredVcfs(params.pipelineVersion, params.cohortId, params.sampleName)
 
-        VariantSet vs = null
-        VariantSet.withTransaction {
-            vs = VariantSet.findById(params.variantSetId)
-        }
-
-        if (vs) {
-            // Find the matching file based on the name
-            List<String> filePaths = vs.parseFilePaths()
-            File file = null
-            filePaths.each { aFilePath ->
-                File aFile = new File(aFilePath)
-                if (aFile.name.equals(filename)) {
-                    file = aFile
-                }
-            }
-
-            logger.info("file="+file)
-            // File found?
-            if (file) {
-                response.setHeader("Content-Disposition", "Attachment;filename=" + filename)
-                //response.setHeader("Accept-Ranges", "bytes");
-//                if (filename.endsWith(".gz")) {
-//                    response.setHeader("Content-Encoding", "gzip");
-//                }
-
+        if (files && files[0]) {
+            File file = files[0]
+                response.setHeader("Content-Disposition", "Attachment;filename=" + file.name)
                 DownloadHelper.download(params, request, response, file)
-            } else {
-                render ('file not found')
-            }
+        } else {
+            render ('file not found')
         }
     }
-
 
     def bam() {
 
-        // Parse the id to remove the trailing .bam extension
-        String rgsId = params.readGroupSetId
-        logger.info("rgsId="+rgsId)
         logger.info("filename="+params.filename)
 
-        ReadGroupSet rgs = null
-        ReadGroupSet.withTransaction {
-            rgs = ReadGroupSet.findById(rgsId)
+        File file = null
+        if (params.filename.endsWith('.bam')) {
+            List files = bamService.findBam(params.pipelineVersion, params.cohortId, params.sampleName)
+            if (files && files[0]) {
+                file = files[0]
+            }
+        } else if (params.filename.endsWith('.bai')) {
+            List files = bamService.findBamIdx(params.pipelineVersion, params.cohortId, params.sampleName)
+            if (files && files[0]) {
+                file = files[0]
+            }
         }
 
-        if (rgs) {
-            File file = null
-            if (params.filename.endsWith('.bam')) {
-                file = new File(rgs.dataUrl)
-            } else if (params.filename.endsWith('.bai')) {
-                file = new File(rgs.indexFile)
-            }
 
+        if (file) {
             response.setHeader("Content-Disposition", "Attachment;filename=" + file.name)
-            //response.setHeader("Accept-Ranges", "bytes");
-            //response.setHeader("Content-Encoding", "gzip");
             DownloadHelper.download(params, request, response, file)
+        } else {
+            render ("file not found")
         }
 
     }
+
 
     def summary() {
 
