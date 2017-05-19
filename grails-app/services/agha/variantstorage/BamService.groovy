@@ -19,7 +19,8 @@ class BamService {
      */
     def List findBam(String pipelineVersion,String cohortId, String sampleName) {
 
-        Closure filesClosure = { File samplesBioRunDir, List files ->
+        Closure filesClosure = { File sampleBioRunDir, List files ->
+
             // Filter by summary folder
             new File(sampleBioRunDir.absolutePath).eachDirMatch(~/bam/) { bamDir ->
                 logger.info('bamDir: ' + bamDir.name)
@@ -51,7 +52,7 @@ class BamService {
      */
     def List findBamIdx(String pipelineVersion,String cohortId, String sampleName) {
 
-        Closure filesClosure = { File samplesBioRunDir, List files ->
+        Closure filesClosure = { File sampleBioRunDir, List files ->
             // Filter by summary folder
             new File(sampleBioRunDir.absolutePath).eachDirMatch(~/bam/) { bamDir ->
                 logger.info('bamDir: ' + bamDir.name)

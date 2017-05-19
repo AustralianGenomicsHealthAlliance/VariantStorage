@@ -5,13 +5,13 @@ import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
 
 @Secured(value=["IS_AUTHENTICATED_FULLY"])
-class VcfController {
+class BamController {
 
-    VcfService vcfService
+    BamService bamService
 
-    def vcf() {
+    def bam() {
 
-        List files = vcfService.findUnfilteredVcfs(params.pipelineVersion, params.cohortId, params.sampleName)
+        List files = bamService.findBam(params.pipelineVersion, params.cohortId, params.sampleName)
 
         JSONObject jsonObj = new JSONObject()
         long totalSize = 0
@@ -33,7 +33,7 @@ class VcfController {
         withFormat {
             html {
                 //respond rgs, model:[files: files]
-               render jsonObj
+                render jsonObj
             }
             json {
                 render jsonObj

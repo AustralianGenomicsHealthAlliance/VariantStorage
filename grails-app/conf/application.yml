@@ -84,13 +84,9 @@ endpoints:
 ---
 # Dataset names and variant set names to be uppercased?
 uppercase.names: true
-# Use the BAM file name as the ReadGroup name, otherwise, the sample name encoded in the BAM file will be used
-bam.filename.as.readgroupset.name: true
 
 environments:
   development:
-    ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
-#    ga4gh_repo.registry: "/home/philip/ga4gh-server-env/registry.db"
     camel.import: "file:/home/philip/ga4gh_registration?move=archived"
     existing.files.root: "/home/philip/ga4gh-server-env/cpi_datasets"
     hla.root: "/home/philip/hla"
@@ -104,10 +100,12 @@ environments:
     hla.root: "/mnt/hla-genotyper"
     samtools.path: "/bin/samtools"
   production:
-    ga4gh_repo.path: "/home/philip/ga4gh-server-env/bin"
-#    ga4gh_repo.registry: "/home/philip/ga4gh-server-env/registry.db"
-    camel.import: "file:/home/philip/ga4gh_registration?move=archived"
-    existing.files.root: "/home/philip/ga4gh-server-env/cpi_datasets"
+    grails.serverURL: "https://130.56.244.154/variantStorage"
+    camel.import: "file:/mnt/u86_nfs/camel?move=archived"
+    existing.files.root: "/mnt/u86_nfs/variantdb/runs"
+    hla.root: "/mnt/hla-genotyper"
+    samtools.path: "/bin/samtools"
+
 
 
 # grails mail plugin setting
@@ -122,39 +120,19 @@ hibernate:
         use_query_cache: false
         region.factory_class: org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
 
-dataSources:
-    ga4gh:
-        dbCreate: "none"
-        url: "jdbc:sqlite:registry.db"
-        logSql: "false"
-        dialect: "org.hibernate.dialect.SQLiteDialect"
-        driverClassName: "org.sqlite.JDBC"
-        readOnly: "true"
-
-    dataSource:
-        driverClassName: "org.postgresql.Driver"
-        pooled: true
-        dbCreate: "update"
-        url: "jdbc:postgresql://localhost:5432/variant_storage"
-
 
 environments:
     development:
         dataSources:
-            ga4gh:
-                dbCreate: "none"
-                url: "jdbc:sqlite:/home/philip/ga4gh-server-env/registry.db"
             dataSource:
                 driverClassName: "org.postgresql.Driver"
                 dbCreate: "update"
+                pooled: true
                 url: "jdbc:postgresql://localhost:5432/variant_storage"
                 username: "postgres"
                 password: "postgres"
     test:
         dataSources:
-            ga4gh:
-                dbCreate: "none"
-                url: "jdbc:sqlite:/mnt/ga4gh/registry.db"
             dataSource:
                 driverClassName: "org.postgresql.Driver"
                 dbCreate: "update"
@@ -164,26 +142,15 @@ environments:
 
 
     production:
-        dataSource:
-            dbCreate: "none"
-            properties:
-                jmxEnabled: true
-                initialSize: 5
-                maxActive: 50
-                minIdle: 5
-                maxIdle: 25
-                maxWait: 10000
-                maxAge: 600000
-                timeBetweenEvictionRunsMillis: 5000
-                minEvictableIdleTimeMillis: 60000
-                validationQuery: SELECT 1
-                validationQueryTimeout: 3
-                validationInterval: 15000
-                testOnBorrow: true
-                testWhileIdle: true
-                testOnReturn: false
-                jdbcInterceptors: ConnectionState
-                defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
+            dataSource:
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+                driverClassName: "org.postgresql.Driver"
+                dbCreate: "update"
+                pooled: true
+                url: "jdbc:postgresql://localhost:5432/ga4gh_frontend"
+                username: "agha"
+                password: "changeme"
+
 
 
 

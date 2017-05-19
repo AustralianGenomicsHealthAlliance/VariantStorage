@@ -32,25 +32,37 @@ class DownloadController {
         }
     }
 
+    def vcfIdx() {
+
+        List files = vcfService.findUnfilteredIdx(params.pipelineVersion, params.cohortId, params.sampleName)
+
+        if (files && files[0]) {
+            File file = files[0]
+            response.setHeader("Content-Disposition", "Attachment;filename=" + file.name)
+            DownloadHelper.download(params, request, response, file)
+        } else {
+            render ('file not found')
+        }
+    }
+
+
     def bam() {
 
-        logger.info("filename="+params.filename)
-
-        File file = null
-        if (params.filename.endsWith('.bam')) {
-            List files = bamService.findBam(params.pipelineVersion, params.cohortId, params.sampleName)
-            if (files && files[0]) {
-                file = files[0]
-            }
-        } else if (params.filename.endsWith('.bai')) {
-            List files = bamService.findBamIdx(params.pipelineVersion, params.cohortId, params.sampleName)
-            if (files && files[0]) {
-                file = files[0]
-            }
+        List files = bamService.findBam(params.pipelineVersion, params.cohortId, params.sampleName)
+        if (files && files[0]) {
+            def file = files[0]
+            response.setHeader("Content-Disposition", "Attachment;filename=" + file.name)
+            DownloadHelper.download(params, request, response, file)
+        } else {
+            render ("file not found")
         }
+    }
 
 
-        if (file) {
+    def bai() {
+        List files = bamService.findBamIdx(params.pipelineVersion, params.cohortId, params.sampleName)
+        if (files && files[0]) {
+            def file = files[0]
             response.setHeader("Content-Disposition", "Attachment;filename=" + file.name)
             DownloadHelper.download(params, request, response, file)
         } else {

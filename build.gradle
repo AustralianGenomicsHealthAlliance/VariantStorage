@@ -96,5 +96,5 @@ assets {
 }
 
 war {
-    archiveName="ga4gh_frontend.war"
+    archiveName="variantStorage.war"
 }
