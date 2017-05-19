@@ -25,7 +25,8 @@ class HlaController {
         HlaGenotyperService.HlaEthnicity ethnicity= HlaGenotyperService.HlaEthnicity.valueOf(params.ethnicity)
 
         List files = bamService.findBam(params.pipelineVersion, params.cohortId, params.sampleName)
-
+        logger.info('files: '+files)
+        String errMsg
         if (files && files[0]) {
             File bam = files[0]
 
@@ -54,7 +55,7 @@ class HlaController {
                 }
             }
         } else {
-            errMsg = "Could not find ReadGroupSet with ID: " + params.readGroupSetId
+            errMsg = "Could not find Sample with ID: " + params.sampleName
         }
 
 
